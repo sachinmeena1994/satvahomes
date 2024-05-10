@@ -1,24 +1,27 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './Components/Layout';
+
+const Home = lazy(() => import('./Pages/Home'));
+const ProductList = lazy(() => import('./Pages/Product-List'));
+const ProductCard = lazy(() => import('./Pages/Product-List'));
+const Loading = lazy(()=> import('./Components/Loader'))
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Layout>
+        <Suspense fallback={<Loading/>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/product-category" element={<ProductList />} />
+            <Route path="/products/:id" element={<ProductCard />} />
+            {/* Add more routes for other pages */}
+          </Routes>
+        </Suspense>
+      </Layout>
+    </Router>
   );
 }
 
