@@ -1,47 +1,32 @@
-import React, { useRef, useEffect } from 'react';
+
 import * as THREE from 'three';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import React, { Suspense, useRef } from 'react';
+import { Canvas, useLoader } from '@react-three/fiber';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+
+
 
 function ThreeComponent() {
-  const containerRef = useRef();
-
-  useEffect(() => {
-    // Set up Three.js scene
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    containerRef.current.appendChild(renderer.domElement);
-
-    // Create a simple cube
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-
-    // Position the camera
-    camera.position.z = 5;
-
-    // Add mouse controls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.update();
-
-    // Render the scene
-    const animate = () => {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    };
-    animate();
-
-    // Clean up on unmount
-    return () => {
-      containerRef.current.removeChild(renderer.domElement);
-    };
-  }, []);
-
-  return <div ref={containerRef} />;
-}
+    const gltf = useLoader(GLTFLoader, '/room/scene.gltf');
+  
+    const cameraRef = useRef();
+    const controlsRef = useRef();
+  
+    return (
+      <Canvas>
+        <ambientLight intensity={0.5} />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
+        <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
+  
+        <Suspense fallback={null}>
+          <primitive object={gltf.scene} />
+        </Suspense>
+  
+        <OrbitControls ref={controlsRef} />
+      </Canvas>
+    );
+  }
+  
 
 export default ThreeComponent;
