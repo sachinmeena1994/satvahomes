@@ -33,8 +33,8 @@ function Header() {
               <option key={category}>{category}</option>
             ))}
           </select>
-          <input className="border-l border-gray-300 bg-transparent font-semibold text-sm pl-4" type="text" placeholder="I'm searching for ..." />
-          <FaSearch className="h-5 px-4 text-gray-500" />
+          {/* <input className="border-l border-gray-300 bg-transparent font-semibold text-sm pl-4" type="text" placeholder="I'm searching for ..." />
+          <FaSearch className="h-5 px-4 text-gray-500" /> */}
         </div>
 
         {/* Buttons */}
