@@ -16,6 +16,7 @@ function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/product-category/:category" element={<ProductList />} />
             {/* <Route path="/product-category" element={<ProductList />} />
             <Route path="/products/:id" element={<ProductCard />} /> */}
             {/* Add more routes for other pages */}
