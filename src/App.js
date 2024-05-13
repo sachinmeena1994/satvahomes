@@ -3,7 +3,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Components/Layout';
 import Loading from './Components/Loader';
-
+import { firebaseInitialized } from './firebase-config';
 // Lazy load components
 const Home = lazy(() => import('./Pages/Home'));
 const ProductList = lazy(() => import('./Pages/Product-List'));
