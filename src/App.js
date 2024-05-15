@@ -8,6 +8,9 @@ import { firebaseInitialized } from './firebase-config';
 const Home = lazy(() => import('./Pages/Home'));
 const ProductList = lazy(() => import('./Pages/Product-List'));
 const ProductCard = lazy(() => import('./Pages/Product-Card'));
+const Login = lazy(()=> import('./Pages/Login'))
+const Admin = lazy(()=>import('./Pages/Admin'))
+
 
 function App() {
   return (
@@ -16,6 +19,7 @@ function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/product-category/:category" element={<ProductList />} />
             {/* <Route path="/product-category" element={<ProductList />} />
             <Route path="/products/:id" element={<ProductCard />} /> */}
