@@ -8,7 +8,7 @@ import ContactUs from "../Components/ContactUs";
 function Home() {
   return (
     <>
-      <div className="bg-green-200 xl:h-[86.5vh] lg:h-[89.5vh] h-[65vw]"></div>
+      <div className="bg-green-200 xl:h-[86.5vh] lg:h-[89.5vh] sm:h-[68.5vw] h-[85vw]"></div>
       <CategoriesLinks />
       <CategorySlider/>
       <ContactUs/>

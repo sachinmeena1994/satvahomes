@@ -20,7 +20,7 @@ const Footer = () => {
         <a target="_blank" href="https://www.facebook.com/profile.php?id=100083395065561&mibextid=ZbWKwL" className="p-3 rounded-full bg-zinc-300 hover:bg-blue-300 duration-300">
           <FaFacebookF className="h-4 w-4" />
         </a>
-        <a target="_blank" href='/' className="p-3 rounded-full bg-zinc-300 hover:bg-[#056e5598] duration-300">
+        <a target="_blank" href='https://satvahomes.com' className="p-3 rounded-full bg-zinc-300 hover:bg-[#056e5598] duration-300">
           <AiOutlineHome className="h-4 w-4" />
         </a>
         <a target="_blank" href="https://in.linkedin.com/company/satva-homes" className="p-3 rounded-full bg-zinc-300 hover:bg-blue-300 duration-300">
@@ -32,7 +32,7 @@ const Footer = () => {
       </div>
       <div className="footer-right text-sm text-zinc-400 mt-5 md:mt-0">
         <h1>
-          Copyright © <span>satvahomes</span> designed by ask
+          Copyright © <a href='https://satvahomes.com' className="hover:text-[#056e55] duration-300">satvahomes</a> designed by ask
         </h1>
       </div>
     </div>
