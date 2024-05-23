@@ -7,6 +7,7 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { GoSearch } from "react-icons/go";
 import { IoArrowForwardCircleOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
+import { GrUserAdmin } from "react-icons/gr";
 
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
@@ -82,6 +83,9 @@ function Testheader() {
             </div>
 
           </div>
+          <Link to="/">
+            <GrUserAdmin className="hidden hover:text-[#056E55] duration-200 lg:hidden text-zinc-900 text-2xl" />
+          </Link>
           <GoSearch className="hidden lg:block xl:hidden text-zinc-900 text-2xl" />
           <Link
             to="/"

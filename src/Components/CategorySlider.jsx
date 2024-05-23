@@ -4,7 +4,7 @@ import { MdArrowRight } from "react-icons/md";
 
 const CategorySlider = () => {
   return (
-    <div className="mt-10 xl:w-[76.5rem] mx-auto flex flex-col items-center lg:flex-row px-14">
+    <div className="mt-10 gap-10 lg:gap-0 mb-20 xl:w-[76.5rem] mx-auto flex flex-col lg:items-center lg:flex-row lg:px-14 px-4">
       <div className="CategorySlideText lg:w-[30%] whitespace-wrap flex flex-col items-start">
         <h1 className="text-[#056E55] font-bold text-4xl">
           Download <br /> by categories
@@ -28,7 +28,7 @@ const CategorySlider = () => {
             Unique designs
           </h1>
         </div>
-        <div className="mt-12 mb-20 hover:text-[#FF6F00] duration-300">
+        <div className="mt-12 hover:text-[#FF6F00] duration-300">
           <Link
             to="/"
             className="text-xs flex items-center gap-2 font-bold"
