@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { useParams, useNavigate } from 'react-router-dom';
+import { getFirestore, collection, query, getDocs } from 'firebase/firestore';
 
 function ProductList() {
   const { category } = useParams();
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Function to fetch products from Firestore based on category
     const fetchProducts = async () => {
       try {
         const db = getFirestore();
@@ -15,9 +15,9 @@ function ProductList() {
         const q = query(productsCollectionRef);
 
         const querySnapshot = await getDocs(q);
-        const productsData = querySnapshot.docs.map(doc => doc.data());
+        const productsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setProducts(productsData);
-        console.log(productsData)
+        console.log(productsData);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
@@ -28,12 +28,18 @@ function ProductList() {
     }
   }, [category]);
 
+  const handleProductClick = (productId) => {
+    navigate(`/product/${category}/${productId}`);
+  };
+
   return (
     <div>
       <h2>Products in category: {category}</h2>
       <ul>
-        {products.map((product, index) => (
-          <li key={index}>{product.name}</li>
+        {products.map((product) => (
+          <li key={product.id} onClick={() => handleProductClick(product.id)} style={{ cursor: 'pointer' }}>
+            {product.name}
+          </li>
         ))}
       </ul>
     </div>

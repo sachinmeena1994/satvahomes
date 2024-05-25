@@ -7,7 +7,6 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { GoSearch } from "react-icons/go";
 import { IoArrowForwardCircleOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
-import { GrUserAdmin } from "react-icons/gr";
 
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
@@ -15,6 +14,7 @@ function Testheader() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const navigate = useNavigate();
+  
   useEffect(() => {
     // Function to fetch product categories from Firestore
     const fetchCategories = async () => {
@@ -69,23 +69,29 @@ function Testheader() {
 
         {/* Search */}
 
+        {/* Category Dropdown */}
+        <div className="hidden relative border-[1px] min-w-[10vw] py-3 border-zinc-300 rounded xl:flex justify-center xl:ml-[25vw] items-center px-3 pl-4">
+          <div className="text-zinc-500 text-sm justify-between flex items-center gap-3">
+            <select
+              className="bg-transparent uppercase font-bold text-sm p-4 mr-4"
+              name="categories"
+              id="categories"
+              onChange={handleCategoryChange}
+              value={selectedCategory}
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <IoIosArrowDown className="mt-1" />
+          </div>
+        </div>
+
         {/* {Buttons} */}
         <div className="lg:absolute lg:right-0 2xl:mr-16 lg:mr-5 flex items-center gap-4">
-          <div className="hidden relative border-[1px] min-w-[10vw] py-3 border-zinc-300 rounded xl:flex justify-center xl:ml-[25vw] items-center px-3 pl-4">
-            <div className="text-zinc-500 text-sm justify-between flex items-center gap-3">
-              <h1 className="hover:text-[#056E55] font-semibold cursor-pointer duration-200">
-                All Category
-              </h1>
-              <IoIosArrowDown className="mt-1" />
-            </div>
-            <div className="hidden min-w-[12vw] rounded h-52 z-20 absolute bg-red-100 top-16">
-
-            </div>
-
-          </div>
-          <Link to="/">
-            <GrUserAdmin className="hidden hover:text-[#056E55] duration-200 lg:hidden text-zinc-900 text-2xl" />
-          </Link>
           <GoSearch className="hidden lg:block xl:hidden text-zinc-900 text-2xl" />
           <Link
             to="/"
