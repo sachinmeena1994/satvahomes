@@ -1,9 +1,10 @@
 import './App.css';
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Components/Layout';
 import Loading from './Components/Loader';
-import { firebaseInitialized, auth } from './firebase-config';
+import { auth } from './firebase-config';
+import ProtectedRoute from './Components/ProtectedRoute'; // Import the new ProtectedRoute component
 
 // Lazy load components
 const Home = lazy(() => import('./Pages/Home'));
@@ -38,11 +39,14 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/product-category/:category" element={<ProductList />} />
             <Route path="/product/:category/:productId" element={<ProductCard />} /> {/* Updated route */}
-            {user ? (  // Assuming you want to restrict access to /admin for authenticated users
-              <Route path="/admin" element={<Admin />} />
-            ) : (
-              <Navigate to="/login" />
-            )}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute user={user}>
+                  <Admin />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Suspense>
       </Layout>
