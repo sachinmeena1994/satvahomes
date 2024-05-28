@@ -38,11 +38,12 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/product-category/:category" element={<ProductList />} />
             <Route path="/product/:category/:productId" element={<ProductCard />} /> {/* Updated route */}
-            {user ? (  // Assuming you want to restrict access to /admin for authenticated users
+            {/* {user ? (  // Assuming you want to restrict access to /admin for authenticated users */}
               <Route path="/admin" element={<Admin />} />
-            ) : (
-              <Navigate to="/login" />
-            )}
+            {/* ) : (
+              <></>
+              // <Navigate to="/login" />
+            )} */}
           </Routes>
         </Suspense>
       </Layout>

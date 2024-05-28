@@ -1,11 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { MdArrowRight } from "react-icons/md";
+import CategorySwiper from "./CategorySwiper";
 
 const CategorySlider = () => {
   return (
     <div className="mt-10 gap-10 lg:gap-0 mb-20 xl:w-[76.5rem] mx-auto flex flex-col lg:items-center lg:flex-row lg:px-14 px-4">
-      <div className="CategorySlideText lg:w-[30%] whitespace-wrap flex flex-col items-start">
+      <div className="CategorySlideText lg:w-[25%] whitespace-wrap flex flex-col items-start">
         <h1 className="text-[#056E55] font-bold text-4xl">
           Download <br /> by categories
         </h1>
@@ -29,17 +30,16 @@ const CategorySlider = () => {
           </h1>
         </div>
         <div className="mt-12 hover:text-[#FF6F00] duration-300">
-          <Link
-            to="/"
-            className="text-xs flex items-center gap-2 font-bold"
-          >
+          <Link to="/" className="text-xs flex items-center gap-2 font-bold">
             <h1>ALL CATEGORIES</h1>
             <MdArrowRight className="text-lg" />
           </Link>
           <hr className="pr-5 mt-2 w-[94%] border-none h-[0.5px] hover:bg-[#FF6F00] bg-black" />
         </div>
       </div>
-      <div className="SlideCategory lg:w-[70%] h-52 bg-red-100"></div>
+      <div className="mx-2 SlideCategory relative h-full md:h-[30vw] lg:h-[18vw] lg:w-[75%]">
+        <CategorySwiper />
+      </div>
     </div>
   );
 };

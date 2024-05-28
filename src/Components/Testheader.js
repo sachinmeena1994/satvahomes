@@ -14,7 +14,7 @@ function Testheader() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     // Function to fetch product categories from Firestore
     const fetchCategories = async () => {
@@ -69,29 +69,25 @@ function Testheader() {
 
         {/* Search */}
 
-        {/* Category Dropdown */}
-        <div className="hidden relative border-[1px] min-w-[10vw] py-3 border-zinc-300 rounded xl:flex justify-center xl:ml-[25vw] items-center px-3 pl-4">
-          <div className="text-zinc-500 text-sm justify-between flex items-center gap-3">
+        {/* {Buttons} */}
+        <div className="lg:absolute lg:right-0 2xl:mr-16 lg:mr-5 flex items-center gap-4">
+          {/* Category Dropdown */}
+          <div className=" border hidden md:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
             <select
-              className="bg-transparent uppercase font-bold text-sm p-4 mr-4"
+              className="outline-none bg-transparent uppercase rounded font-bold text-sm p-3 mr-4"
               name="categories"
               id="categories"
               onChange={handleCategoryChange}
               value={selectedCategory}
             >
-              <option value="">Select a category</option>
+              <option className="text-zinc-500" value="">Select a category</option>
               {categories.map((category) => (
-                <option key={category} value={category}>
+                <option className="text-zinc-500" key={category} value={category}>
                   {category}
                 </option>
               ))}
             </select>
-            <IoIosArrowDown className="mt-1" />
           </div>
-        </div>
-
-        {/* {Buttons} */}
-        <div className="lg:absolute lg:right-0 2xl:mr-16 lg:mr-5 flex items-center gap-4">
           <GoSearch className="hidden lg:block xl:hidden text-zinc-900 text-2xl" />
           <Link
             to="/"
