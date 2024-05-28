@@ -5,7 +5,7 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 import PDFGenerator from '../Components/PDFGenerator';
 import CreateProduct from '../Components/CreateProduct';
-
+import ProductManager from '../Components/ProductManager'; // Import ProductManager component
 
 function Admin() {
   const [menuOption, setMenuOption] = useState('');
@@ -39,8 +39,6 @@ function Admin() {
     setExpandedUserIndex(index === expandedUserIndex ? null : index);
   };
 
-
-
   return (
     <div className="flex flex-row w-full border-opacity-50">
       <aside className="w-1/4 bg-gray-200 p-6" style={{ height: "100vh" }}>
@@ -48,11 +46,11 @@ function Admin() {
           <li className="cursor-pointer" onClick={() => setMenuOption('users')}>Users</li>
           <li className="cursor-pointer" onClick={() => setMenuOption('createProduct')}>Create Product</li>
           <li className="cursor-pointer" onClick={() => setMenuOption('createPDF')}>Create PDF</li>
+          <li className="cursor-pointer" onClick={() => setMenuOption('manageProducts')}>Manage Products</li>
           {/* Add more menu options as needed */}
         </ul>
       </aside>
       <main className="w-3/4 bg-white p-6">
-        {/* <h2 className="text-lg font-semibold">{menuOption === 'users' ? 'Users' : 'Add Products'}</h2> */}
         <div>
           {menuOption === 'users' && (
             <div>
@@ -71,23 +69,6 @@ function Admin() {
                       <h4 className="text-md font-semibold">Email:</h4>
                       <p>{user.email}</p>
                     </div>
-                    {/* <div className="card bg-gray-100 p-2 mb-2">
-                      <h4 className="text-md font-semibold">ID:</h4>
-                      <p>{user.id}</p>
-                    </div> */}
-                    {/* <div className="card bg-gray-100 p-2 mb-2">
-                      <h4 className="text-md font-semibold">Location:</h4>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <p className="text-sm font-semibold">City:</p>
-                          <p>{user.location.city}</p>
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold">State:</p>
-                          <p>{user.location.state}</p>
-                        </div>
-                      </div>
-                    </div> */}
                     <div className="card bg-gray-100 p-2 mb-2">
                       <h4 className="text-md font-semibold">Role:</h4>
                       <div className="flex items-center">
@@ -109,17 +90,21 @@ function Admin() {
               ))}
             </div>
           )}
-          {menuOption =="createPDF" &&(
- <div>
-<PDFGenerator/>
-</div>
+          {menuOption === 'createPDF' && (
+            <div>
+              <PDFGenerator />
+            </div>
           )}
-               {menuOption =="createProduct" &&(
- <div>
-<CreateProduct/>
-</div>
+          {menuOption === 'createProduct' && (
+            <div>
+              <CreateProduct />
+            </div>
           )}
-          {/* Add more content based on menu option */}
+          {menuOption === 'manageProducts' && (
+            <div>
+              <ProductManager />
+            </div>
+          )}
         </div>
       </main>
     </div>
