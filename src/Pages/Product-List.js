@@ -64,7 +64,7 @@ function ProductList() {
             onClick={() => handleProductClick(product.id)}
           >
             <ProductCard
-              image={product.productImages && product.productImages[0]}
+              image={product.productmages && product.productImages[0]}
               title={product.name}
               description={product.description}
             />
