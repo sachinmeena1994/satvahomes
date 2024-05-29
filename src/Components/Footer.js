@@ -9,7 +9,7 @@ import { FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <div className="flex flex-col items-center justify-center md:flex-row md:justify-between mt-12 mb-12 mx-auto max-w-[80%]">
+    <div className="flex flex-col md:mb-12 mb-20 items-center justify-center md:flex-row md:justify-between mt-12 mx-auto max-w-[80%]">
       <div className="footer-left flex gap-2">
         <a target="_blank" href='https://twitter.com/SatvaHomes?t=RBJwyCcuiyo90CfG-tQmeQ&s=09' className="p-3 rounded-full bg-zinc-300 hover:bg-zinc-200 duration-300">
           <FaXTwitter className="h-4 w-4" />

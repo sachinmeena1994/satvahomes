@@ -7,6 +7,7 @@ import { IoIosHeartEmpty } from "react-icons/io";
 import { GoSearch } from "react-icons/go";
 import { IoArrowForwardCircleOutline } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
+import { RxPerson } from "react-icons/rx";
 
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
@@ -14,6 +15,11 @@ function Testheader() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     // Function to fetch product categories from Firestore
@@ -39,9 +45,29 @@ function Testheader() {
     <header className="bg-white">
       <div className=" mx-auto text-white px-4 py-5 2xl:px-14 xl:py-8 flex justify-between lg:justify-start items-center relative">
         {/* Burger Menu */}
-        <div className="lg:hidden">
+        {/* <div className="lg:hidden">
           <RxHamburgerMenu className="text-2xl text-zinc-500 " />
-        </div>
+        </div> */}
+        <button
+          onClick={toggleMenu}
+          className="flex z-10 lg:hidden flex-col items-center justify-center w-fit h-fit space-y-[5px]"
+        >
+          <div
+            className={`h-[1.3px] w-5 bg-black transition-transform duration-300 ease-in-out ${
+              isOpen ? "transform rotate-45 translate-y-[7px]" : ""
+            }`}
+          />
+          <div
+            className={`h-[1.3px] w-5 bg-black transition-opacity duration-300 ease-in-out ${
+              isOpen ? "opacity-0" : "opacity-100"
+            }`}
+          />
+          <div
+            className={`h-[1.3px] w-5 bg-black transition-transform duration-300 ease-in-out ${
+              isOpen ? "transform -rotate-45 -translate-y-[6px]" : ""
+            }`}
+          />
+        </button>
 
         {/* Logo */}
         <div>
@@ -71,8 +97,19 @@ function Testheader() {
 
         {/* {Buttons} */}
         <div className="lg:absolute lg:right-0 2xl:mr-16 lg:mr-5 flex items-center gap-4">
+          <Link to="/">
+            <RxPerson className="block hover:text-[#056E55] duration-200 md:hidden text-zinc-900 text-2xl" />
+          </Link>
+
+          <Link
+            to="/"
+            className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
+          >
+            <IoArrowForwardCircleOutline className=" text-2xl" />
+            <h1 className=" text-md mb-[1px] font-semibold">Login</h1>
+          </Link>
           {/* Category Dropdown */}
-          <div className=" border hidden md:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
+          <div className=" border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
             <select
               className="outline-none bg-transparent uppercase rounded font-bold text-sm p-3 mr-4"
               name="categories"
@@ -80,31 +117,20 @@ function Testheader() {
               onChange={handleCategoryChange}
               value={selectedCategory}
             >
-              <option className="text-zinc-500" value="">Select a category</option>
+              <option className="text-zinc-500" value="">
+                Select a category
+              </option>
               {categories.map((category) => (
-                <option className="text-zinc-500" key={category} value={category}>
+                <option
+                  className="text-zinc-500"
+                  key={category}
+                  value={category}
+                >
                   {category}
                 </option>
               ))}
             </select>
           </div>
-          <GoSearch className="hidden lg:block xl:hidden text-zinc-900 text-2xl" />
-          <Link
-            to="/"
-            className="hidden text-zinc-900 hover:text-[#056E55] duration-200 lg:flex lg:gap-[2px] lg:items-center"
-          >
-            <IoArrowForwardCircleOutline className=" text-2xl" />
-            <h1 className=" text-md mb-[1px]">Login</h1>
-          </Link>
-          <Link to="/">
-            <IoIosHeartEmpty className="hidden hover:text-[#056E55] duration-200 lg:block text-zinc-900 text-2xl" />
-          </Link>
-          <Link to="/" className="relative">
-            <PiBag className="text-zinc-900 text-2xl hover:text-[#056E55] duration-200" />
-            <div className="absolute -top-[50%] -right-[40%] px-2 py-[1px] rounded-full bg-green-800 flex items-center">
-              <h1 className="flex items-center text-[0.6rem]">0</h1>
-            </div>
-          </Link>
         </div>
       </div>
       <hr className="bg-zinc-200 border-none h-[1px]" />

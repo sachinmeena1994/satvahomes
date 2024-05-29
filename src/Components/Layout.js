@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import Testheader from './Testheader';
+import MobileBottomNav from './MobileBottomNav';
 
 
 const Layout = ({ children }) => {
@@ -11,6 +12,7 @@ const Layout = ({ children }) => {
       <Testheader/>
       <main className="content">{children}</main>
       <Footer />
+      <MobileBottomNav/>
     </div>
   );
 };
