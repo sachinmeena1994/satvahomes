@@ -50,7 +50,7 @@ function Testheader() {
         </div> */}
         <button
           onClick={toggleMenu}
-          className="flex z-10 lg:hidden flex-col items-center justify-center w-fit h-fit space-y-[5px]"
+          className="flex z-40 lg:hidden flex-col items-center justify-center w-fit h-fit space-y-[5px]"
         >
           <div
             className={`h-[1.3px] w-5 bg-black transition-transform duration-300 ease-in-out ${
@@ -68,6 +68,34 @@ function Testheader() {
             }`}
           />
         </button>
+        <aside
+          className={`lg:hidden fixed z-30 top-0 left-0 w-72 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+            isOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="p-4 mt-16">
+            <nav className="mt-4 flex flex-col items-center">
+              <Link
+                href="#"
+                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-300"
+              >
+                Home
+              </Link>
+              <Link
+                href="#"
+                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-300"
+              >
+                About
+              </Link>
+              <Link
+                href="#"
+                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-300"
+              >
+                Contact
+              </Link>
+            </nav>
+          </div>
+        </aside>
 
         {/* Logo */}
         <div>
