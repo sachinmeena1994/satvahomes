@@ -7,6 +7,7 @@ function ProductCard() {
   const { category, productId } = useParams();
   const [product, setProduct] = useState(null);
   const [advertisementData, setAdvertisementData] = useState([]);
+  const [selectedImage, setSelectedImage] = useState('');
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -16,7 +17,11 @@ function ProductCard() {
         const productDoc = await getDoc(productDocRef);
 
         if (productDoc.exists()) {
-          setProduct(productDoc.data());
+          const productData = productDoc.data();
+          setProduct(productData);
+          if (productData.productImages && productData.productImages.length > 0) {
+            setSelectedImage(productData.productImages[0]);
+          }
         } else {
           console.log('No such document!');
         }
@@ -120,18 +125,40 @@ function ProductCard() {
   };
 
   return (
-    <div>
+    <div className="flex justify-center items-center p-6">
       {product ? (
-        <div>
-          <h2>{product.name}</h2>
-          <p>{product.description}</p>
-          <div>
-            <h3>Product Images</h3>
-            {product.productImages && product.productImages.map((image, index) => (
-              <img key={index} src={image} alt={`Product ${index + 1}`} style={{ width: '200px', marginRight: '10px' }} />
-            ))}
+        <div className="flex flex-col lg:flex-row bg-white border border-gray-300 rounded-lg shadow-lg p-6 max-w-5xl">
+          <div className="flex flex-col lg:w-1/2 pr-6">
+            <div className="flex flex-col items-center mb-4">
+              <img src={selectedImage} alt="Selected Product" className="w-96 h-96 object-cover mb-4" />
+              <div className="flex space-x-2">
+                {product.productImages && product.productImages.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    className={`w-20 h-20 object-cover cursor-pointer ${selectedImage === image ? 'border-2 border-green-600' : 'border'}`}
+                    onClick={() => setSelectedImage(image)}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-          <button onClick={handleDownloadPDF}>Download PDF</button>
+          <div className="flex flex-col lg:w-1/2">
+            <h2 className="text-2xl font-bold mb-4">{product.name}</h2>
+            <p className="text-lg mb-4">{product.description}</p>
+            <ul className="list-none mb-6">
+              {product.pdfDetails && product.pdfDetails.map((pdfDetail, index) => (
+                <li key={index} className="bg-gray-200 p-2 mb-2 rounded">{pdfDetail.size}</li>
+              ))}
+            </ul>
+            <button
+              className="bg-green-600 text-white py-1 px-3 rounded hover:bg-green-700"
+              onClick={handleDownloadPDF}
+            >
+              Download PDF
+            </button>
+          </div>
         </div>
       ) : (
         <p>Loading product details...</p>
