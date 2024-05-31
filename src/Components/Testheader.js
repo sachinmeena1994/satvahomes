@@ -130,7 +130,7 @@ function Testheader() {
           </Link>
 
           <Link
-            to="/"
+            to="/login"
             className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
           >
             <IoArrowForwardCircleOutline className=" text-2xl" />

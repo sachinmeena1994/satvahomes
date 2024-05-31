@@ -34,6 +34,15 @@ const LoginSignup = () => {
     }
   }, [state]);
 
+  const resetFormdata = ()=>{
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setName("");
+    setState("");
+    setCity("");
+  }
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -66,6 +75,7 @@ const LoginSignup = () => {
         navigate("/");
       }
     } catch (error) {
+      resetFormdata();
       console.error("Authentication Error:", error.message);
       alert("Authentication Error. Please try again.");
     }
@@ -85,15 +95,15 @@ const LoginSignup = () => {
       className="flex justify-center items-center min-h-[100vh] bg-white"
       style={{
         backgroundImage:
-          "url('https://images.unsplash.com/photo-1519642918688-7e43b19245d8?q=80&w=1776&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+          "url('/images/bgLogin.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
       <div className="flex flex-col my-16 xs:my-32 lg:flex-row shadow-gray-500 shadow-md rounded-lg overflow-hidden w-[85vw] xs:w-[70vw] lg:w-full max-w-5xl h-full">
         <div className="w-full min-h-[80vh] bg-white bg-opacity-40 backdrop-blur-md lg:w-1/2 p-10 flex flex-col justify-center">
-          <h1 className={`text-center text-gray-800 text-2xl ${isForgotPassword ? 'mb-1':'mb-8'}  font-bold`}>
-            {isForgotPassword? "Forgot Password" : isSignUp ? "Sign Up" : "Login"}
+          <h1 className={`text-center text-gray-800 text-xl xs:text-2xl ${isForgotPassword ? 'mb-1':'mb-8'}  font-bold`}>
+            {isForgotPassword? "Forgot Password" : isSignUp ? "Sign Up" : "Login your account"}
           </h1>
           {showForm && (
             <form onSubmit={handleFormSubmit}>
@@ -115,22 +125,23 @@ const LoginSignup = () => {
                   placeholder="Name"
                 />
               )}
+              <div className="flex w-full flex-col md:flex-row justify-between">
               {isSignUp && (
-                <div className="mb-6">
-                  <label
+                <div className="mb-6 md:w-[50%]">
+                  {/* <label
                     htmlFor="state"
                     className="block text-gray-800 font-semibold mb-2"
                   >
                     State
-                  </label>
-                  <div className="bg-gray-200 pr-4 rounded-lg">
+                  </label> */}
+                  <div className="bg-gray-200 pr-4 w-full rounded-lg">
                     <select
                       id="state"
                       className="bg-gray-200 px-4 py-3 w-full rounded-lg text-gray-800 placeholder-gray-600 outline-none"
                       value={state}
                       onChange={(e) => setState(e.target.value)}
                     >
-                      <option value="">Select State</option>
+                      <option className="py-1 hover:bg-gray-100" value="">Select State</option>
                       {Object.keys(districts).map((stateName) => (
                         <option key={stateName} value={stateName}>
                           {stateName}
@@ -141,17 +152,17 @@ const LoginSignup = () => {
                 </div>
               )}
               {isSignUp && (
-                <div className="mb-6">
-                  <label
+                <div className="mb-6 md:w-[45%]">
+                  {/* <label
                     htmlFor="city"
                     className="block text-gray-800 font-semibold mb-2"
                   >
                     City
-                  </label>
+                  </label> */}
                   <div className="bg-gray-200 pr-4 rounded-lg">
                     <select
                       id="city"
-                      className="bg-gray-200 px-4 py-3 w-full rounded-lg text-gray-800 placeholder-gray-600 outline-none"
+                      className="bg-gray-200 px-4 py-3 w-[100%] rounded-lg text-gray-800 placeholder-gray-600 outline-none"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                     >
@@ -165,6 +176,7 @@ const LoginSignup = () => {
                   </div>
                 </div>
               )}
+              </div>
               {!isForgotPassword && (
                 <div className="relative">
                   <input
@@ -232,7 +244,7 @@ const LoginSignup = () => {
           )}
           {!isForgotPassword && (
             <div>
-              <h2 className="text-gray-800 text-center text-lg">
+              <h2 className="text-gray-800 text-center xs:text-lg">
                 {isSignUp
                   ? "Already have an account?"
                   : "Don't have an account yet?"}
@@ -258,7 +270,7 @@ const LoginSignup = () => {
           className="w-full min-h-[80vh] bg-gray-400 hidden lg:block lg:w-1/2 bg-cover"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1558603668-6570496b66f8?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+              "url(/images/loginimg.jpg)",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
