@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { PiBag } from "react-icons/pi";
 import { IoIosHeartEmpty } from "react-icons/io";
@@ -16,6 +16,7 @@ function Testheader() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -77,25 +78,41 @@ function Testheader() {
             <nav className="mt-4 flex flex-col items-center">
               <Link
                 to="/faq"
-                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-700"
+                className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
+                  location.pathname === "/faq" ? "text-[#056E55]" : "text-black"
+                }`}
               >
                 Faq
               </Link>
               <Link
                 to="/about"
-                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-700"
+                className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
+                  location.pathname === "/about"
+                    ? "text-[#056E55]"
+                    : "text-black"
+                }`}
               >
                 About
               </Link>
               <Link
-                to='/contact'
-                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-700"
+                to="/contact"
+                className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
+                  location.pathname === "/contact"
+                    ? "text-[#056E55]"
+                    : "text-black"
+                }`}
               >
                 Contact
               </Link>
             </nav>
           </div>
         </aside>
+
+        <div
+          className={`fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-20 transition-opacity duration-700 ${
+            isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        ></div>
 
         {/* Logo */}
         <div>
@@ -110,13 +127,28 @@ function Testheader() {
 
         {/* Links */}
         <div className="hidden ml-32 xl:ml-[5vw] lg:flex lg:items-center text-black text-[18px] gap-6 2xl:gap-10 font-medium">
-          <Link to="/faq" className="hover:text-[#056E55] duration-200" >
+          <Link
+            to="/faq"
+            className={` hover:text-[#056E55] duration-200 ${
+              location.pathname === "/faq" ? "text-[#056E55]" : "text-black"
+            }`}
+          >
             Faq
           </Link>
-          <Link to="/about" className="hover:text-[#056E55] duration-200" >
+          <Link
+            to="/about"
+            className={` hover:text-[#056E55] duration-200 ${
+              location.pathname === "/about" ? "text-[#056E55]" : "text-black"
+            }`}
+          >
             About
           </Link>
-          <Link to='/contact' className="hover:text-[#056E55] duration-200" >
+          <Link
+            to="/contact"
+            className={` hover:text-[#056E55] duration-200 ${
+              location.pathname === "/contact" ? "text-[#056E55]" : "text-black"
+            }`}
+          >
             Contact
           </Link>
         </div>
