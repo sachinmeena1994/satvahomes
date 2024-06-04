@@ -5,6 +5,9 @@ import Layout from './Components/Layout';
 import Loading from './Components/Loader';
 import { auth } from './firebase-config';
 import ProtectedRoute from './Components/ProtectedRoute'; // Import the new ProtectedRoute component
+import FAQ from './Pages/FAQ';
+import About from './Pages/About';
+import Contact from './Pages/Contact';
 
 // Lazy load components
 const Home = lazy(() => import('./Pages/Home'));
@@ -37,10 +40,13 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/product-category/:category" element={<ProductList />} />
             <Route path="/product/:category/:productId" element={<ProductCard />} /> {/* Updated route */}
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <ProtectedRoute user={user}>
                   <Admin />
