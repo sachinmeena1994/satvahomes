@@ -13,10 +13,22 @@ module.exports = {
           '0%': { opacity: 1, transform: 'scale(1)' },
           '100%': { opacity: 0, transform: 'scale(0.7)' },
         },
+        loading: {
+          '0%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(50%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        pulsate: {
+          '0%': { opacity: '0.5' },
+          '50%': { opacity: '1' },
+          '100%': { opacity: '0.5' },
+        },
       },
       animation: {
         customFadeInScale: 'customFadeInScale 1s ease forwards',
         customFadeOut: 'customFadeOut 1s ease forwards',
+        loading: 'loading 1.5s infinite',
+        pulsate: 'pulsate 1.5s infinite',
       },
       screens: {
         'xs': '480px',  // Custom breakpoint for extra small devices

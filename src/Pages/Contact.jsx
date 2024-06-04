@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import TraverseNav from "../Components/TraverseNav";
 import { useLocation } from "react-router-dom";
 import { FaXTwitter } from "react-icons/fa6";
@@ -11,6 +11,11 @@ import { FaLinkedin } from "react-icons/fa";
 const Contact = () => {
   const location = useLocation();
   const path = location.pathname.substring(1);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleIframeLoad = () => {
+    setIsLoading(false);
+  };
 
   return (
     <div
@@ -93,7 +98,15 @@ const Contact = () => {
               </a>
             </div>
           </div>
-          <div className="map-div lg:w-[67%]">
+          <div className="map-div relative lg:w-[67%]">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+                <div className="w-full h-full relative overflow-hidden bg-gray-200">
+                  <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-gray-300 to-transparent animate-loading"></div>
+                  <div className="absolute top-0 left-0 w-full h-full animate-pulsate"></div>
+                </div>
+              </div>
+            )}
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d487083.0066007439!2d78.13091015625!3d17.49146750000001!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91bd4f80fb9b%3A0x779ca94e24738b51!2sSatva%20Homes%20Interior%20Design%20Studio!5e0!3m2!1sen!2sus!4v1717468917139!5m2!1sen!2sus"
               className="w-full min-h-[34rem] h-full"
@@ -101,6 +114,7 @@ const Contact = () => {
               allowFullScreen=""
               aria-hidden="false"
               tabIndex="0"
+              onLoad={handleIframeLoad}
             ></iframe>
           </div>
         </div>
