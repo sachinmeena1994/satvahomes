@@ -46,50 +46,50 @@ function Testheader() {
       <div className=" mx-auto text-white px-4 py-5 2xl:px-14 xl:py-8 flex justify-between lg:justify-start items-center relative">
         {/* Burger Menu */}
         {/* <div className="lg:hidden">
-          <RxHamburgerMenu className="text-2xl text-zinc-500 " />
+          <RxHamburgerMenu className="text-2xl text-zinc-700 " />
         </div> */}
         <button
           onClick={toggleMenu}
           className="flex z-40 lg:hidden flex-col items-center justify-center w-fit h-fit space-y-[5px]"
         >
           <div
-            className={`h-[1.3px] w-5 bg-black transition-transform duration-300 ease-in-out ${
+            className={`h-[1.3px] w-5 bg-black transition-transform duration-700 ease-in-out ${
               isOpen ? "transform rotate-45 translate-y-[7px]" : ""
             }`}
           />
           <div
-            className={`h-[1.3px] w-5 bg-black transition-opacity duration-300 ease-in-out ${
+            className={`h-[1.3px] w-5 bg-black transition-opacity duration-700 ease-in-out ${
               isOpen ? "opacity-0" : "opacity-100"
             }`}
           />
           <div
-            className={`h-[1.3px] w-5 bg-black transition-transform duration-300 ease-in-out ${
+            className={`h-[1.3px] w-5 bg-black transition-transform duration-700 ease-in-out ${
               isOpen ? "transform -rotate-45 -translate-y-[6px]" : ""
             }`}
           />
         </button>
         <aside
-          className={`lg:hidden fixed z-30 top-0 left-0 w-72 h-full bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+          className={`lg:hidden fixed z-30 top-0 left-0 w-72 h-full bg-white shadow-lg transform transition-transform duration-700 ease-in-out ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <div className="p-4 mt-16">
             <nav className="mt-4 flex flex-col items-center">
               <Link
-                href="#"
-                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-300"
+                to="/faq"
+                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-700"
               >
-                Home
+                Faq
               </Link>
               <Link
-                href="#"
-                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-300"
+                to="/about"
+                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-700"
               >
                 About
               </Link>
               <Link
-                href="#"
-                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-300"
+                to='/contact'
+                className="block text-3xl font-semibold px-4 py-2 text-gray-700 hover:text-[#056E55] duration-700"
               >
                 Contact
               </Link>
@@ -110,13 +110,13 @@ function Testheader() {
 
         {/* Links */}
         <div className="hidden ml-32 xl:ml-[5vw] lg:flex lg:items-center text-black text-[18px] gap-6 2xl:gap-10 font-medium">
-          <Link className="hover:text-[#056E55] duration-200" to="/">
+          <Link to="/faq" className="hover:text-[#056E55] duration-200" >
             Faq
           </Link>
-          <Link className="hover:text-[#056E55] duration-200" to="/">
+          <Link to="/about" className="hover:text-[#056E55] duration-200" >
             About
           </Link>
-          <Link className="hover:text-[#056E55] duration-200" to="/">
+          <Link to='/contact' className="hover:text-[#056E55] duration-200" >
             Contact
           </Link>
         </div>
@@ -145,12 +145,12 @@ function Testheader() {
               onChange={handleCategoryChange}
               value={selectedCategory}
             >
-              <option className="text-zinc-500" value="">
+              <option className="text-zinc-700" value="">
                 Select a category
               </option>
               {categories.map((category) => (
                 <option
-                  className="text-zinc-500"
+                  className="text-zinc-700"
                   key={category}
                   value={category}
                 >

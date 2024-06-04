@@ -9,7 +9,7 @@ import HeroSwiper from "../Components/HeroSwiper";
 function Home() {
   return (
     <>
-      <div className="xl:h-[86.5vh] lg:h-[89.5vh] sm:h-[68.5vw] h-[85vw]">
+      <div className="select-none xl:h-[86.5vh] lg:h-[89.5vh] sm:h-[68.5vw] h-[85vw]">
         <HeroSwiper/>
       </div>
       <CategoriesLinks />
