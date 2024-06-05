@@ -192,7 +192,7 @@ function ProductCard() {
               <div className="h-px border border-gray"></div>
               <ul className="list-disc list-inside mb-4">
                 {transformDescriptionToBulletPoints(product.description).map((point, index) => (
-                  <li className="my-1" key={index}>{point.trim()}</li>
+                  <li className="my-8" key={index}>{point.trim()}</li>
                 ))}
               </ul>
               <div className="flex space-y-2 mb-6 items-center">
@@ -215,45 +215,14 @@ function ProductCard() {
                 {/* {selectedOption === "" && (
                   <p className="text-red-600 mb-4">Please choose an option.</p>
                 )} */}
-              </div>
-              <div className="flex flex-row space-x-4 mb-6">
-                <div className="flex">
-                  <div className="border">
-                    <p className="mt-3 px-4">1</p>
-                  </div>
-                  <div className="border flex flex-col">
-                    <button className="px-4">+</button>
-                    <div className="h-px border"></div>
-                    <button>-</button>
-                  </div>
-                </div>
-                <button className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 w-full">
-                  Add to Cart
-                </button>
-                <button className="bg-[#056e55] text-white py-2 px-4 rounded hover:bg-blue-700 w-full opacity-50">
-                  Buy Now
-                </button>
-              </div>
-              <div className="flex flex-row space-x-4 justify-start">
-                <div className="self-center p-4 border border-black">
-                  <Heart size={20} color="#000" strokeWidth={0.75} />
-                </div>
-                <a className="self-center" href="">
-                  Add to wishlist
-                </a>
-                <div className="self-center p-4 border border-black">
-                  <Shuffle size={20} color="#000" strokeWidth={0.75} />
-                </div>
-                <a className="self-center" href="">
-                  compare
-                </a>
                 <button
-                  className="bg-green-600 text-white py-2 rounded hover:bg-green-700 w-full"
+                  className="bg-green-600 text-white py-2 rounded hover:bg-green-700 w-1/3 mx-10"
                   onClick={handleDownloadPDF}
                 >
                   Download PDF
                 </button>
               </div>
+              
             </div>
           </div>
         </div>
