@@ -3,6 +3,7 @@ import "./productCard.css";
 
 function ProductCard({ image, title, description }) {
   const truncateDescription = (desc, length) => {
+    if (!desc) return "";
     return desc.length > length ? desc.substring(0, length) + "..." : desc;
   };
 
