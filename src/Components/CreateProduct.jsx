@@ -6,7 +6,8 @@ const CreateProduct = () => {
   const [productDetails, setProductDetails] = useState({
     name: '',
     description: '',
-    productImages: []
+    productImages: [],
+    category: ''
   });
   const [categories, setCategories] = useState([]);
   const [pdfDetails, setPdfDetails] = useState([]);
@@ -35,7 +36,30 @@ const CreateProduct = () => {
   };
 
   const handleAddPdfDetails = () => {
-    setPdfDetails(prevDetails => [...prevDetails, { size: '', materialImage: null, pdfProductImage: null, steps: [] }]);
+    if (pdfDetails.length === 0) {
+      setPdfDetails([{
+        size: '', 
+        materialImage: null, 
+        pdfProductImage: null, 
+        steps: [],
+        materialInfo: {
+          plywood18mm: '',
+          plywood12mm: '',
+          plywood8mm: '',
+          mdf3mm: '',
+          hinges: '',
+          channels: '',
+          handles: '',
+          internalLaminate: '',
+          externalLaminate1: '',
+          externalLaminate2: '',
+          externalLaminate3: '',
+          profileDoor: '',
+          mirrorSize: '',
+          legs: ''
+        }
+      }]);
+    }
   };
 
   const handlePdfDetailChange = (index, field, value) => {
@@ -47,6 +71,12 @@ const CreateProduct = () => {
   const handlePdfDetailImageChange = (index, field, file) => {
     const newPdfDetails = [...pdfDetails];
     newPdfDetails[index][field] = file;
+    setPdfDetails(newPdfDetails);
+  };
+
+  const handleMaterialInfoChange = (pdfIndex, fieldName, value) => {
+    const newPdfDetails = [...pdfDetails];
+    newPdfDetails[pdfIndex].materialInfo[fieldName] = value;
     setPdfDetails(newPdfDetails);
   };
 
@@ -108,36 +138,42 @@ const CreateProduct = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8">
-      <h2 className="text-lg font-semibold mb-4">Create Product</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
+      <h2 className="text-2xl font-bold mb-6 text-gray-700">Create Product</h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label>Product Name:</label>
+          <label className="block text-sm font-medium text-gray-700">Product Name:</label>
           <input
             type="text"
             value={productDetails.name}
             onChange={(e) => setProductDetails({ ...productDetails, name: e.target.value })}
-            className="border rounded p-2 w-full"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div>
-          <label>Description:</label>
+          <label className="block text-sm font-medium text-gray-700">Description:</label>
           <textarea
             value={productDetails.description}
             onChange={(e) => setProductDetails({ ...productDetails, description: e.target.value })}
-            className="border rounded p-2 w-full"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div>
-          <label>Product Images:</label>
-          <input type="file" accept="image/*" multiple onChange={handleProductImagesChange} />
+          <label className="block text-sm font-medium text-gray-700">Product Images:</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleProductImagesChange}
+            className="mt-1 block w-full text-sm text-gray-500"
+          />
         </div>
         <div>
-          <label>Category:</label>
+          <label className="block text-sm font-medium text-gray-700">Category:</label>
           <select
             value={productDetails.category}
             onChange={(e) => setProductDetails({ ...productDetails, category: e.target.value })}
-            className="border rounded p-2 w-full"
+            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select a category</option>
             {categories.map(category => (
@@ -146,46 +182,74 @@ const CreateProduct = () => {
           </select>
         </div>
 
-        {/* PDF Details */}
         <div>
-          <button type="button" onClick={handleAddPdfDetails} className="bg-blue-500 text-white px-4 py-2 rounded">
+          <button
+            type="button"
+            onClick={handleAddPdfDetails}
+            className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
             Add PDF Details
           </button>
           {pdfDetails.map((pdfDetail, index) => (
-            <div key={index} className="border p-4 mt-2">
+            <div key={index} className="border p-4 mt-4 rounded-lg bg-gray-50">
               <div>
-                <label>Size:</label>
+                <label className="block text-sm font-medium text-gray-700">Size:</label>
                 <input
                   type="text"
                   value={pdfDetail.size}
                   onChange={(e) => handlePdfDetailChange(index, 'size', e.target.value)}
-                  className="border rounded p-2 w-full"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <label>Material Image:</label>
-                <input type="file" accept="image/*" onChange={(e) => handlePdfDetailImageChange(index, 'materialImage', e.target.files[0])} />
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">PDF Product Image:</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handlePdfDetailImageChange(index, 'pdfProductImage', e.target.files[0])}
+                  className="mt-1 block w-full text-sm text-gray-500"
+                />
               </div>
-              <div>
-                <label>PDF Product Image:</label>
-                <input type="file" accept="image/*" onChange={(e) => handlePdfDetailImageChange(index, 'pdfProductImage', e.target.files[0])} />
-              </div>
+
+              {/* Material Information */}
+              {Object.keys(pdfDetail.materialInfo).map((material, matIndex) => (
+                <div key={matIndex} className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700">{material.toUpperCase().replace(/_/g, ' ')}:</label>
+                  <input
+                    type="number"
+                    value={pdfDetail.materialInfo[material]}
+                    onChange={(e) => handleMaterialInfoChange(index, material, e.target.value)}
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <span className="text-sm text-gray-500">{getMaterialInfoDescription(material)}</span>
+                </div>
+              ))}
+
               {/* Steps */}
-              <div>
-                <button type="button" onClick={() => handleAddStep(index)} className="bg-blue-500 text-white px-4 py-2 rounded mt-2">
+              <div className="mt-6">
+                <button
+                  type="button"
+                  onClick={() => handleAddStep(index)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
                   Add Step
                 </button>
                 {pdfDetail.steps.map((step, stepIndex) => (
-                  <div key={stepIndex} className="border p-4 mt-2">
-                    <div>Step {stepIndex + 1}</div>
+                  <div key={stepIndex} className="border p-4 mt-4 rounded-lg bg-white shadow-sm">
+                    <div className="text-sm font-medium text-gray-700">Step {stepIndex + 1}</div>
                     <input
                       type="text"
                       value={step.text}
                       onChange={(e) => handleStepChange(index, stepIndex, 'text', e.target.value)}
                       placeholder="Enter step text"
-                      className="border rounded p-2 w-full"
+                      className="mt-2 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <input type="file" accept="image/*" onChange={(e) => handleStepChange(index, stepIndex, 'image', e.target.files[0])} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleStepChange(index, stepIndex, 'image', e.target.files[0])}
+                      className="mt-2 block w-full text-sm text-gray-500"
+                    />
                   </div>
                 ))}
               </div>
@@ -193,12 +257,36 @@ const CreateProduct = () => {
           ))}
         </div>
 
-        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded" disabled={loading}>
+        <button
+          type="submit"
+          className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+          disabled={loading}
+        >
           {loading ? 'Creating...' : 'Create Product'}
         </button>
       </form>
     </div>
   );
+};
+
+const getMaterialInfoDescription = (material) => {
+  const descriptions = {
+    plywood18mm: ' sheets (use IS:710 MR Grade Plywood for more durability. IS:303 can also be used).',
+    plywood12mm: ' sheet (*we can also use MDF/HDHMR sheets).',
+    plywood8mm: ' sheet (*we can also use MDF/HDHMR sheets).',
+    mdf3mm: ' sheet (optional).',
+    hinges: ' sets (use soft closing hinges for smooth transition).',
+    channels: ' sets (use telescopic soft-closing channels for smooth transition).',
+    handles: ' no.',
+    internalLaminate: ' sheets (use 0.8mm laminate sheets).',
+    externalLaminate1: ' sheet (African desert matt finish). *we can use laminates / veneer / acrylic sheets etc., Select the external finish material according to budget.',
+    externalLaminate2: ' sheets (Honey maple wood texture). *we can use laminates / veneer / acrylic sheets etc., Select the external finish material according to budget.',
+    externalLaminate3: ' (if any).',
+    profileDoor: ' (4 NO. (1\'X1\'6")).',
+    mirrorSize: ' (if any).',
+    legs: ' (if any).'
+  };
+  return descriptions[material] || '';
 };
 
 export default CreateProduct;

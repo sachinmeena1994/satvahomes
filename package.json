@@ -13,6 +13,8 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "lucide-react": "^0.381.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.4.168",
     "postcss": "^8.4.38",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

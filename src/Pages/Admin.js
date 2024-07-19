@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { fireDB } from '../firebase-config';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-
 import PDFGenerator from '../Components/PDFGenerator';
 import CreateProduct from '../Components/CreateProduct';
-import ProductManager from '../Components/ProductManager'; // Import ProductManager component
+import ProductManager from '../Components/ProductManager';
 
 function Admin() {
   const [menuOption, setMenuOption] = useState('');
@@ -40,40 +39,46 @@ function Admin() {
   };
 
   return (
-    <div className="flex flex-row w-full border-opacity-50">
-      <aside className="w-1/4 bg-gray-200 p-6" style={{ height: "100vh" }}>
+    <div className="flex flex-row w-full border-opacity-50 min-h-screen">
+      <aside className="w-1/4 bg-gradient-to-r from-blue-400 to-blue-700 p-6 text-white" style={{ height: '100vh' }}>
         <ul className="mt-4">
-          <li className="cursor-pointer" onClick={() => setMenuOption('users')}>Users</li>
-          <li className="cursor-pointer" onClick={() => setMenuOption('createProduct')}>Create Product</li>
-          <li className="cursor-pointer" onClick={() => setMenuOption('createPDF')}>Create PDF</li>
-          <li className="cursor-pointer" onClick={() => setMenuOption('manageProducts')}>Manage Products</li>
-          {/* Add more menu options as needed */}
+          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'users' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('users')}>Users</li>
+          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'createProduct' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('createProduct')}>Create Product</li>
+          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'advertisement' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('advertisement')}>Vendor</li>
+          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'manageProducts' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('manageProducts')}>Manage Products</li>
         </ul>
       </aside>
-      <main className="w-3/4 bg-white p-6">
+      <main className="w-3/4 bg-gray-50 p-6">
         <div>
           {menuOption === 'users' && (
             <div>
               {users.map((user, index) => (
-                <div key={index} className="card bg-gray-100 p-4 mb-4">
-                  <h3 className="text-lg font-semibold cursor-pointer flex items-center" onClick={() => toggleUserDetails(index)}>
-                    {user.name}
-                    {expandedUserIndex === index ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
+                <div key={index} className="bg-white shadow-md rounded-lg p-6 mb-6 transition-transform transform hover:scale-102">
+                  <h3
+                    className="text-xl font-semibold cursor-pointer flex items-center justify-between"
+                    onClick={() => toggleUserDetails(index)}
+                  >
+                  Name :  {user.name}
+                    {expandedUserIndex === index ? (
+                      <FaChevronUp className="ml-1" />
+                    ) : (
+                      <FaChevronDown className="ml-1" />
+                    )}
                   </h3>
-                  <div className={expandedUserIndex === index ? 'block' : 'hidden'}>
-                    <div className="card bg-gray-100 p-2 mb-2">
-                      <h4 className="text-md font-semibold">Name:</h4>
+                  <div className={expandedUserIndex === index ? 'block mt-4' : 'hidden'}>
+                    <div className="bg-gray-100 p-4 mb-4 rounded-lg">
+                      <h4 className="text-md font-semibold mb-2">Name:</h4>
                       <p>{user.name}</p>
                     </div>
-                    <div className="card bg-gray-100 p-2 mb-2">
-                      <h4 className="text-md font-semibold">Email:</h4>
+                    <div className="bg-gray-100 p-4 mb-4 rounded-lg">
+                      <h4 className="text-md font-semibold mb-2">Email:</h4>
                       <p>{user.email}</p>
                     </div>
-                    <div className="card bg-gray-100 p-2 mb-2">
-                      <h4 className="text-md font-semibold">Role:</h4>
+                    <div className="bg-gray-100 p-4 mb-4 rounded-lg">
+                      <h4 className="text-md font-semibold mb-2">Role:</h4>
                       <div className="flex items-center">
                         <select
-                          className="border rounded-md py-1 px-2 mr-2"
+                          className="border rounded-md py-2 px-3 mr-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
                           value={user.role}
                           onChange={(e) => handleEditRole(index, e.target.value)}
                         >
@@ -82,7 +87,12 @@ function Admin() {
                           <option value="vendor">Vendor</option>
                           <option value="designer">Designer</option>
                         </select>
-                        <button className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600" onClick={handleUpdateRole}>Update</button>
+                        <button
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          onClick={handleUpdateRole}
+                        >
+                          Update
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -90,7 +100,7 @@ function Admin() {
               ))}
             </div>
           )}
-          {menuOption === 'createPDF' && (
+          {menuOption === 'advertisement' && (
             <div>
               <PDFGenerator />
             </div>

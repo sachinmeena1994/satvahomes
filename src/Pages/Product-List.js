@@ -3,10 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getFirestore, collection, query, getDocs } from "firebase/firestore";
 import ProductCard from "../Components/ProductCard/ProductCard"; // Adjust the import path as needed
 import TraverseNav from "../Components/TraverseNav";
+import Loader from "../Components/Loader";
 
 function ProductList() {
   const { category } = useParams();
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +30,8 @@ function ProductList() {
         console.log(productsData);
       } catch (error) {
         console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -36,11 +40,13 @@ function ProductList() {
     }
   }, [category]);
 
-  console.log("products:::", products);
-
   const handleProductClick = (productId) => {
     navigate(`/product/${category}/${productId}`);
   };
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div>
