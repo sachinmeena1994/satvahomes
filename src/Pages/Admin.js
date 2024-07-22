@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { fireDB } from '../firebase-config';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import PDFGenerator from '../Components/PDFGenerator';
+import VendorDashboard from '../Components/VendorDashboard';
 import CreateProduct from '../Components/CreateProduct';
 import ProductManager from '../Components/ProductManager';
+import BulkUpload from '../Components/BulkUpload';
 
 function Admin() {
   const [menuOption, setMenuOption] = useState('');
@@ -46,6 +47,7 @@ function Admin() {
           <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'createProduct' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('createProduct')}>Create Product</li>
           <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'advertisement' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('advertisement')}>Vendor</li>
           <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'manageProducts' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('manageProducts')}>Manage Products</li>
+          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'bulkUpload' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('bulkUpload')}>Bulk Upload</li>
         </ul>
       </aside>
       <main className="w-3/4 bg-gray-50 p-6">
@@ -58,7 +60,7 @@ function Admin() {
                     className="text-xl font-semibold cursor-pointer flex items-center justify-between"
                     onClick={() => toggleUserDetails(index)}
                   >
-                  Name :  {user.name}
+                    Name :  {user.name}
                     {expandedUserIndex === index ? (
                       <FaChevronUp className="ml-1" />
                     ) : (
@@ -102,7 +104,7 @@ function Admin() {
           )}
           {menuOption === 'advertisement' && (
             <div>
-              <PDFGenerator />
+              <VendorDashboard />
             </div>
           )}
           {menuOption === 'createProduct' && (
@@ -113,6 +115,11 @@ function Admin() {
           {menuOption === 'manageProducts' && (
             <div>
               <ProductManager />
+            </div>
+          )}
+          {menuOption === 'bulkUpload' && (
+            <div>
+              <BulkUpload />
             </div>
           )}
         </div>
