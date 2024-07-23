@@ -130,7 +130,7 @@ const BulkUpload = () => {
   return (
     <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-700">Bulk Upload Products</h2>
-      
+
       {/* Image Upload Section */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700">Upload Images:</label>
