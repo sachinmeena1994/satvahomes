@@ -9,7 +9,7 @@ const TraverseNav = ({ pathname }) => {
 
   return (
     <div className="bg-transparent h-[30vh] gap-5 flex flex-col items-center justify-center">
-      <h1 className="text-white text-5xl font-semibold">{capitalizeFirstLetter(pathname)}</h1>
+      <h1 className="text-white text-center text-5xl font-semibold">{capitalizeFirstLetter(pathname)}</h1>
       <div className="flex items-center gap-3">
         <Link to='/' className="text-lg hover:text-white duration-300 text-zinc-100">Home </Link>
         <MdArrowForwardIos className="text-xs text-zinc-100"/>
