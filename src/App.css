@@ -24,12 +24,13 @@
     flex-direction: column;
     align-items: center;
     animation: scaleIn 0.5s ease-in-out;
+    color: #ffffff;
     
   }
   
   .loader-spinner {
-    border: 4px solid rgba(0, 0, 0, 0.1);
-    border-top: 4px solid #000;
+    border: 4px solid #d5caca;
+    border-top: 4px solid #a69b9b;
     border-radius: 50%;
     width: 3rem;
     height: 3rem;
@@ -41,7 +42,7 @@
     font-size: 1.25rem;
     font-weight: bold;
     text-align: center;
-    color: #333;
+    color: #ffffff;
     animation: textFadeIn 1.5s ease-in-out infinite;
   }
   

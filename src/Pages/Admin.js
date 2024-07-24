@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc ,query, where,} from 'firebase/firestore';
 import { fireDB } from '../firebase-config';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import VendorDashboard from '../Components/VendorDashboard';
@@ -11,12 +11,13 @@ function Admin() {
   const [menuOption, setMenuOption] = useState('');
   const [users, setUsers] = useState([]);
   const [expandedUserIndex, setExpandedUserIndex] = useState(null);
+  const [updatedUserIndex, setUpdatedUserIndex] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       const usersCollection = collection(fireDB, 'users');
       const usersSnapshot = await getDocs(usersCollection);
-      const usersData = usersSnapshot.docs.map((doc) => doc.data());
+      const usersData = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setUsers(usersData);
     };
 
@@ -29,12 +30,28 @@ function Admin() {
     const updatedUsers = [...users];
     updatedUsers[index].role = newRole;
     setUsers(updatedUsers);
+    setUpdatedUserIndex(index); // Set the index of the user whose role is being edited
   };
-
-  const handleUpdateRole = () => {
-    // Handle update logic here
+  const handleUpdateRole = async (index) => {
+    const userToUpdate = users[index];
+    const usersCollection = collection(fireDB, 'users');
+    const q = query(usersCollection, where('email', '==', userToUpdate.email));
+  
+    try {
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0].ref; // Get the document reference
+        await updateDoc(userDoc, { role: userToUpdate.role });
+        alert('Role updated successfully!');
+      } else {
+        alert('User not found.');
+      }
+    } catch (error) {
+      console.error('Error updating role: ', error);
+      alert('Failed to update role.');
+    }
+    setUpdatedUserIndex(null); // Reset the updated user index after the update operation
   };
-
   const toggleUserDetails = (index) => {
     setExpandedUserIndex(index === expandedUserIndex ? null : index);
   };
@@ -60,7 +77,7 @@ function Admin() {
                     className="text-xl font-semibold cursor-pointer flex items-center justify-between"
                     onClick={() => toggleUserDetails(index)}
                   >
-                    Name :  {user.name}
+                    Name: {user.name}
                     {expandedUserIndex === index ? (
                       <FaChevronUp className="ml-1" />
                     ) : (
@@ -91,7 +108,7 @@ function Admin() {
                         </select>
                         <button
                           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          onClick={handleUpdateRole}
+                          onClick={() => handleUpdateRole(index)}
                         >
                           Update
                         </button>
