@@ -55,6 +55,7 @@ function ProductCard() {
       fetchAdvertisementData();
     }
   }, [category, productId]);
+
   const handleDownloadPDF = async () => {
     try {
       setLoading(true);
@@ -64,28 +65,32 @@ function ProductCard() {
         throw new Error(`Failed to fetch PDF template: ${response.statusText}`);
       }
       const existingPdfBytes = await response.arrayBuffer();
-  
+
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const newPdfDoc = await PDFDocument.create();
-  
+
       const addPageWithTemplate = async () => {
         const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
         newPdfDoc.addPage(templatePage);
         return newPdfDoc.getPage(newPdfDoc.getPageCount() - 1);
       };
-  
+
       let currentPage = await addPageWithTemplate();
-  
-      const addText = (text, x, y, fontSize = 12) => {
-        currentPage.drawText(text, { x, y, size: fontSize, color: rgb(0, 0, 0) });
+
+      const addText = (text, x, y, fontSize = 12, lineHeight = 1.2) => {
+    
+        
+          currentPage.drawText(text, { x, y, size: fontSize, color: rgb(0, 0, 0), maxWidth: 200 });
+        
       };
-  
+      
+
       const addImage = async (imageUrl, x, y, width, height) => {
         try {
           const imgResponse = await fetch(imageUrl);
           const imgBytes = await imgResponse.arrayBuffer();
           const mimeType = imgResponse.headers.get('content-type');
-  
+
           let img;
           if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
             img = await newPdfDoc.embedJpg(imgBytes);
@@ -99,30 +104,30 @@ function ProductCard() {
           console.error(`Error embedding image from URL ${imageUrl}:`, error);
         }
       };
-  
+
       // First page: Product image and basic details
       if (product && product.productImages && product.productImages.length > 0) {
         await addImage(product.productImages[0], 50, 100, 700, 600);
       }
-      addText(`Name: ${product.name}`, 100, 150, 20);
-      addText(`Description: ${product.description}`, 0, 100, 10);
-  
+      // addText(`Name: ${product.name}`, 100, 150, 20);
+      // addText(`Description: ${product.description}`, 0, 100, 10);
+
       // Add footer with UNIT NAME on the first page
       addText(`${product.name}`, 85, 30, 12);
-  
+
       // Second page: Material information in table format
       currentPage = await addPageWithTemplate();
       let yPosition = 550;
       addText("Material Information", 350, yPosition, 20);
       yPosition -= 30;
-  
+
       const materialInfo = product.pdfDetails[0].materialInfo;
       let tableStartX = 20;
       let tableStartY = yPosition;
       let tableWidth = 800;
       let rowHeight = 15;
       let tableHeight = rowHeight * Object.keys(materialInfo).length;
-  
+
       // Draw table borders and headers
       currentPage.drawRectangle({
         x: tableStartX,
@@ -132,16 +137,16 @@ function ProductCard() {
         borderColor: rgb(0, 0.6, 0), // Green color
         borderWidth: 2,
       });
-  
+
       yPosition = tableStartY - rowHeight;
-  
+
       // Draw table rows
       Object.keys(materialInfo).forEach(key => {
         addText(key.replace(/([A-Z])/g, ' $1').toUpperCase(), tableStartX + 5, yPosition);
-        addText(materialInfo[key], tableStartX + tableWidth / 2 + 5, yPosition);
+        addText(materialInfo[key].value ? materialInfo[key].value.toString() : '', tableStartX + tableWidth / 2 + 5, yPosition);
         yPosition -= rowHeight;
       });
-  
+
       // Add the biggest advertisement at the bottom of the material information page
       const addBigBottomAd = (page, adText) => {
         page.drawRectangle({
@@ -160,42 +165,42 @@ function ProductCard() {
           maxWidth: 480,
         });
       };
-      
+
       addBigBottomAd(currentPage, advertisementData[0] ? advertisementData[0].advertise : "Put your ads here");
-  
+
       // Remaining pages: Steps
       if (product.pdfDetails[0].steps && product.pdfDetails[0].steps.length > 0) {
         for (let i = 0; i < product.pdfDetails[0].steps.length; i++) {
           const step = product.pdfDetails[0].steps[i];
           currentPage = await addPageWithTemplate();
           yPosition = 700;
-          addText(`Step ${i + 1}: ${step.text}`, 50, yPosition, 16);
+          addText(`Step ${i + 1}: ${step.text}`, 570, 500, 10 );
           yPosition -= 40;
           if (step.image) {
-            await addImage(step.image, 50, 180, 600, 380);
+            await addImage(step.image, 50, 180, 500, 380);
             yPosition -= 320;
           }
         }
       }
-  
+
       const addRightSideAd = (page, adText) => {
         page.drawRectangle({
-          x: 680,
-          y: 100,
-          width: 140,
+          x: 560,
+          y: 180,
+          width: 250,
           height: 400,
           borderColor: rgb(0, 0.6, 0), // Green color
           borderWidth: 2,
         });
         page.drawText(adText, {
-          x: 680,
-          y: 200,
+          x: 570,
+          y: 240,
           size: 12,
           color: rgb(0, 0, 0),
-          maxWidth: 120,
+          maxWidth: 200,
         });
       };
-  
+
       const addBottomAd = (page, adText) => {
         page.drawRectangle({
           x: 50,
@@ -213,41 +218,41 @@ function ProductCard() {
           maxWidth: 480,
         });
       };
-  
+
       // Add advertisements on each page except the first and the material information page
       for (let i = 2; i < newPdfDoc.getPageCount(); i++) {
         const page = newPdfDoc.getPage(i);
         const adText = advertisementData[0] ? advertisementData[0].advertise : "Put your ads here";
-  
+
         addRightSideAd(page, adText);
         addBottomAd(page, adText);
-  
+
         // Add footer with UNIT NAME
         page.drawText(`${product.name}`, { x: 85, y: 30, size: 12 });
       }
-  
+
       // Add the last page: Vendor and Labor Directory
       currentPage = await addPageWithTemplate();
       yPosition = 700;
       addText("VENDOR AND LABOR DIRECTORY", 200, yPosition, 20);
       yPosition -= 40;
-  
+
       const vendorList = [
         "PLYWOOD & HARDWARE", "HOME DECOR", "FURNISHING", "WALLPAPER", "PAINTS & HARDWARE",
         "FALSE CEILING", "SANITARY FIXTURES", "GRANITE & STONE", "LIGHTS", "ELECTRICAL & HARDWARE",
         "GLASS & MIRROR"
       ];
-  
+
       const laborList = [
         "CARPENTER", "ELECTRICIAN", "GRANITE & TILES LABOR", "FALSE CEILING LABOR", "CORE CUTTING LABOR",
         "PLUMBER", "HELPERS/ LIFTERS", "FOAM WORKER", "CLEANERS", "SAFE/ MOSQUITO NETS"
       ];
-  
-       tableStartX = 50;
-       tableStartY = yPosition;
-       tableWidth = 700;
-       rowHeight = 20;
-  
+
+      tableStartX = 50;
+      tableStartY = yPosition;
+      tableWidth = 700;
+      rowHeight = 20;
+
       // Draw combined table borders
       currentPage.drawRectangle({
         x: tableStartX,
@@ -257,22 +262,22 @@ function ProductCard() {
         borderColor: rgb(0, 0.6, 0), // Green color
         borderWidth: 2,
       });
-  
+
       // Add table headers
       addText("VENDOR LIST", tableStartX + 5, 180 + rowHeight * (Math.max(vendorList.length, laborList.length) + 2), 16);
-      addText("LABOR LIST", tableStartX + tableWidth / 2 + 15, 180 +rowHeight * (Math.max(vendorList.length, laborList.length) + 2), 16);
-  
+      addText("LABOR LIST", tableStartX + tableWidth / 2 + 15, 180 + rowHeight * (Math.max(vendorList.length, laborList.length) + 2), 16);
+
       // Add footer with UNIT NAME on the first page
       addText(`${product.name}`, 85, 30, 12);
       // Add table rows
       vendorList.forEach((item, index) => {
         addText(item, tableStartX + 5, 440 - (index + 1) * rowHeight, 12);
       });
-  
+
       laborList.forEach((item, index) => {
         addText(item, tableStartX + tableWidth / 2 + 15, 440 - (index + 1) * rowHeight, 12);
       });
-  
+
       const pdfBytes = await newPdfDoc.save();
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -289,17 +294,16 @@ function ProductCard() {
       setLoading(false);
     }
   };
-  
-  
+
+
   const transformDescriptionToBulletPoints = (description) => {
     return description.split('.').filter(point => point.trim().length > 0);
   };
 
-  if (loading) {
-    return <Loader />;
-  }
-
   return (
+
+    <>
+    {loading && <Loader/>}
     <div className="flex flex-col items-center p-6 w-full h-full">
       {product ? (
         <div className="bg-white rounded-lg shadow-lg p-6 w-full h-full">
@@ -402,7 +406,10 @@ function ProductCard() {
         <p>No product found.</p>
       )}
     </div>
+    </>
+   
   );
 }
 
 export default ProductCard;
+
