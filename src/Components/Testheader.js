@@ -194,7 +194,7 @@ const Testheader = () => {
             <h1 className="text-md mb-[1px] font-semibold">Login</h1>
           </Link>}
           {/* Category Dropdown */}
-          <div className="border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
+          {user !=null && <div className="border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
             <select
               className="outline-none bg-transparent uppercase rounded font-bold text-sm p-3 mr-4"
               name="categories"
@@ -215,7 +215,7 @@ const Testheader = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </div>}
 
           {/* Admin and Logout Buttons */}
           {user!=null && <Link

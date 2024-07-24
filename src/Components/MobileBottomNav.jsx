@@ -19,10 +19,10 @@ const MobileBottomNav = () => {
       <Link className="text-3xl">
         <CiShop></CiShop>
       </Link>
-      <Link className="text-3xl">
+      <Link to='/' className="text-3xl">
         <BsPerson></BsPerson>
       </Link>
-      <Link className="text-3xl">
+      <Link to='/contact' className="text-3xl">
         <CiMail></CiMail>
       </Link>
     </div>
