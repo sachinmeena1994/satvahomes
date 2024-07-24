@@ -4,6 +4,8 @@ import { RxHamburgerMenu, RxPerson } from "react-icons/rx";
 import { IoArrowForwardCircleOutline } from "react-icons/io5";
 import { useProductCategory } from "../Context/Product-Category-Context"; // Adjust the path as needed
 import { auth } from "../firebase-config"; // Ensure you have Firebase auth configured
+import { useUser } from "../Context/Current-User-Context";
+import { BsPersonCircle } from "react-icons/bs";
 
 const Testheader = () => {
   const { categories, loading } = useProductCategory();
@@ -11,6 +13,7 @@ const Testheader = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { user, userDetails, load } = useUser();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -78,6 +81,16 @@ const Testheader = () => {
               >
                 About
               </Link>
+              {user!=null && <Link
+                to="/admin"
+                className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
+                  location.pathname === "/contact"
+                    ? "text-[#056E55]"
+                    : "text-black"
+                }`}
+              >
+                Admin
+              </Link>}
               <Link
                 to="/contact"
                 className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
@@ -88,6 +101,29 @@ const Testheader = () => {
               >
                 Contact
               </Link>
+
+              <div className="flex justify-center max-w-full">
+                <select
+                  className="w-[80%] bg-white text-3xl font-semibold text-black py-2 px-4 rounded-lg outline-none"
+                  name="categories"
+                  id="categories"
+                  onChange={handleCategoryChange}
+                  value={selectedCategory}
+                >
+                  <option className="text-gray-700 text-xl font-semibold" value="">
+                    Categories
+                  </option>
+                  {categories.map((category) => (
+                    <option
+                      className="text-gray-700 text-[18px]"
+                      key={category}
+                      value={category}
+                    >
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </nav>
           </div>
         </aside>
@@ -137,23 +173,28 @@ const Testheader = () => {
           </Link>
         </div>
 
-        {/* Search */}
-
         {/* {Buttons} */}
         <div className="lg:absolute lg:right-0 2xl:mr-16 lg:mr-5 flex items-center gap-4">
-          <Link to="/">
+          {user==null && <Link to="/login">
             <RxPerson className="block hover:text-[#056E55] duration-200 md:hidden text-zinc-900 text-2xl" />
-          </Link>
+          </Link>}
+          {user!=null && user!=null && <button
+            onClick={handleLogout}
+            className=""
+          >
+            <BsPersonCircle className="block hover:text-[#056E55] text-zinc-700 duration-200 md:hidden text-2xl" />
 
-          <Link
+          </button>}
+
+          {user==null && <Link
             to="/login"
             className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
           >
             <IoArrowForwardCircleOutline className="text-2xl" />
             <h1 className="text-md mb-[1px] font-semibold">Login</h1>
-          </Link>
+          </Link>}
           {/* Category Dropdown */}
-          <div className="border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
+          {user !=null && <div className="border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
             <select
               className="outline-none bg-transparent uppercase rounded font-bold text-sm p-3 mr-4"
               name="categories"
@@ -165,26 +206,30 @@ const Testheader = () => {
                 Select a category
               </option>
               {categories.map((category) => (
-                <option className="text-zinc-700" key={category} value={category}>
+                <option
+                  className="text-zinc-700"
+                  key={category}
+                  value={category}
+                >
                   {category}
                 </option>
               ))}
             </select>
-          </div>
+          </div>}
 
           {/* Admin and Logout Buttons */}
-          <Link
+          {user!=null && <Link
             to="/admin"
             className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
           >
             <h1 className="text-md mb-[1px] font-semibold">Admin</h1>
-          </Link>
-          <button
+          </Link>}
+          {user!=null && <button
             onClick={handleLogout}
             className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
           >
             <h1 className="text-md mb-[1px] font-semibold">Logout</h1>
-          </button>
+          </button>}
         </div>
       </div>
       <hr className="bg-zinc-200 border-none h-[1px]" />

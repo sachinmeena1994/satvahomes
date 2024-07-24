@@ -1,4 +1,4 @@
-import React, { useRef, useState,useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
 import { IoIosArrowBack } from "react-icons/io";
@@ -11,11 +11,26 @@ import "swiper/css/navigation";
 // import required modules
 import { Navigation } from "swiper/modules";
 import { Link } from "react-router-dom";
+import { useProductCategory } from "../Context/Product-Category-Context";
 
 export default function CategorySwiper() {
+  const { categories, loading } = useProductCategory();
   const prevRef = useRef(null);
   const nextRef = useRef(null);
   const swiperRef = useRef(null);
+
+  const categoryImages = {
+    "Shoe Rack": "https://satvahomes.com/wp-content/uploads/2023/09/shoe-rack-finel-render_Scene-11.Denoiser.png",
+    "TV": "https://satvahomes.com/wp-content/uploads/2023/09/TVUC01.jpg",
+    "Partition Unit": "https://satvahomes.com/wp-content/uploads/2023/09/11-2.png",
+    "Wall Panel": "https://satvahomes.com/wp-content/uploads/2023/09/7.png",
+    "Pooja Unit": "https://satvahomes.com/wp-content/uploads/2023/09/puja-deco-render_Scene-14.png",
+    "Bar Unit": "https://satvahomes.com/wp-content/uploads/2023/09/7.png",
+    "Crockery Unit": "https://satvahomes.com/wp-content/uploads/2023/09/12-1.png",
+    "Dressing Table Unit":"https://satvahomes.com/wp-content/uploads/2023/09/study-deco_Scene-4.png",
+    "Study Table Unit":"https://satvahomes.com/wp-content/uploads/2023/09/7.png",
+    "Wardobe": "https://satvahomes.com/wp-content/uploads/2023/09/WRUC01.png",
+  };
 
   useEffect(() => {
     if (swiperRef.current) {
@@ -49,10 +64,25 @@ export default function CategorySwiper() {
           swiperRef.current = swiper;
         }}
         modules={[Navigation]}
-        loop={true} // Enable infinite loop
+        // loop={true} // Enable infinite loop
         className="mySwiper h-[100%]"
       >
-        <SwiperSlide className="overflow-hidden border border-zinc-200">
+
+          {categories.map((category,i) => (
+            <SwiperSlide key={i} className="overflow-hidden border border-zinc-200">
+            <Link>
+              <img
+                className="h-[80%] w-[100%] object-cover transition-transform duration-500 ease-in-out transform hover:scale-105"
+                src={categoryImages[category]}
+                alt=""
+              />
+              <h1 className="h-[50px] md:h-[20%] font-bold text-xl text-zinc-600 flex justify-center items-center z-2 relative bg-white">
+                {category}
+              </h1>
+            </Link>
+            </SwiperSlide>
+          ))}
+        {/* <SwiperSlide className="overflow-hidden border border-zinc-200">
           <Link>
             <img
               className="h-[80%] w-[100%] object-cover transition-transform duration-500 ease-in-out transform hover:scale-105"
@@ -159,19 +189,7 @@ export default function CategorySwiper() {
               Bar
             </h1>
           </Link>
-        </SwiperSlide>
-        <SwiperSlide className="overflow-hidden border border-zinc-200">
-          <Link>
-            <img
-              className="h-[80%] w-[100%] object-cover transition-transform duration-500 ease-in-out transform hover:scale-105"
-              src="https://satvahomes.com/wp-content/uploads/2023/09/7.png"
-              alt=""
-            />
-            <h1 className="h-[50px] md:h-[20%] font-bold text-xl text-zinc-600 flex justify-center items-center z-2 relative bg-white">
-              Bar
-            </h1>
-          </Link>
-        </SwiperSlide>
+        </SwiperSlide> */}
       </Swiper>
       <div className="absolute top-[45%] transform -translate-x-1/2 -translate-y-1/2 left-0 z-10">
         <button
