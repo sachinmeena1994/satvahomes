@@ -8,7 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 import { fireDB } from "../firebase-config";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { FaChevronUp, FaChevronDown, FaUser, FaEnvelope, FaUserTag, FaPen} from "react-icons/fa";
 import VendorDashboard from "../Components/VendorDashboard";
 import CreateProduct from "../Components/CreateProduct";
 import ProductManager from "../Components/ProductManager";
@@ -21,6 +21,7 @@ import {
   FaUpload,
 } from "react-icons/fa";
 import { FaAd, FaProductHunt } from "react-icons/fa";
+
 
 function Admin() {
   const [menuOption, setMenuOption] = useState("");
@@ -146,64 +147,63 @@ function Admin() {
             <div>
               {users.map((user, index) => (
                 <div
-                  key={index}
-                  className="bg-white shadow-md rounded-lg p-6 mb-6 duration-200 transition-all transform hover:scale-102"
+                key={index}
+                className="bg-white shadow-lg border border-gray-200 rounded-lg p-6 mb-6 duration-200 transition-all transform hover:scale-102"
+              >
+                <h3
+                  className="text-xl font-semibold cursor-pointer flex items-center justify-between"
+                  onClick={() => toggleUserDetails(index)}
                 >
-                  <h3
-                    className="text-xl font-semibold cursor-pointer flex items-center justify-between"
-                    onClick={() => toggleUserDetails(index)}
-                  >
-                    Name : {user.name}
-                    <FaChevronUp
-                      className={`ml-1 ${
-                        expandedUserIndex === index
-                          ? "rotate-180 duration-300 text-[#0E6D55]"
-                          : "duration-500"
-                      }`}
-                    />
-                  </h3>
-                  <div
-                    className={`transition-max-height duration-500 ease-in-out overflow-hidden ${
-                      expandedUserIndex === index
-                        ? "max-h-screen mt-4"
-                        : "max-h-0"
+                  <span className="flex items-center">
+                    <FaUser className="mr-2 text-[#0E6D55]" /> {user.name}
+                  </span>
+                  <FaChevronUp
+                    className={`ml-1 transition-transform ${
+                      expandedUserIndex === index ? "rotate-180 duration-300 text-[#0E6D55]" : "duration-500"
                     }`}
-                  >
-                    <div className="bg-gray-100 flex gap-1 p-4 mb-4 rounded-lg">
-                      <h4 className="text-md font-semibold mb-2">Name :</h4>
-                      <p>{user.name}</p>
-                    </div>
-                    <div className="bg-gray-100 flex gap-1 p-4 mb-4 rounded-lg">
-                      <h4 className="text-md font-semibold mb-2">Email :</h4>
-                      <p>{user.email}</p>
-                    </div>
-                    <div className="bg-gray-100 flex gap-2 items-center p-4 mb-4 rounded-lg">
-                      <h4 className="text-md font-semibold mb-2">Role :</h4>
-                      <div className="flex items-center">
-                        <div className="pl-2 border border-zinc-200 rounded-lg mr-2 bg-white">
-                          <select
-                            className="rounded-lg py-2 pb-2 px-2 mr-4 border-none outline-none"
-                            value={user.role}
-                            onChange={(e) =>
-                              handleEditRole(index, e.target.value)
-                            }
-                          >
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                            <option value="vendor">Vendor</option>
-                            <option value="designer">Designer</option>
-                          </select>
-                        </div>
-                        <button
-                          className="bg-[#0e6d55e1] text-white px-4 py-2 duration-300 rounded-lg hover:bg-green-900 outline-none"
-                          onClick={() => handleUpdateRole(index)}
+                  />
+                </h3>
+                <div
+                  className={`transition-max-height duration-500 ease-in-out overflow-hidden ${
+                    expandedUserIndex === index ? "max-h-screen mt-4" : "max-h-0"
+                  }`}
+                >
+                  <div className="bg-gray-50 flex items-center gap-2 p-4 mb-4 rounded-lg border border-gray-200">
+                    <FaUser className="text-[#0E6D55] mr-2" />
+                    <h4 className="text-md font-semibold">Name :</h4>
+                    <p>{user.name}</p>
+                  </div>
+                  <div className="bg-gray-50 flex items-center gap-2 p-4 mb-4 rounded-lg border border-gray-200">
+                    <FaEnvelope className="text-[#0E6D55] mr-2" />
+                    <h4 className="text-md font-semibold">Email :</h4>
+                    <p>{user.email}</p>
+                  </div>
+                  <div className="bg-gray-50 flex items-center gap-2 p-4 mb-4 rounded-lg border border-gray-200">
+                    <FaUserTag className="text-[#0E6D55] mr-2" />
+                    <h4 className="text-md font-semibold">Role :</h4>
+                    <div className="flex items-center">
+                      <div className="pl-2 pr-2 border border-gray-200 rounded-lg mr-2 bg-white">
+                        <select
+                          className="rounded-lg py-2 px-2 mr-4 border-none outline-none bg-white"
+                          value={user.role}
+                          onChange={(e) => handleEditRole(index, e.target.value)}
                         >
-                          Update
-                        </button>
+                          <option value="user">User</option>
+                          <option value="admin">Admin</option>
+                          <option value="vendor">Vendor</option>
+                          <option value="designer">Designer</option>
+                        </select>
                       </div>
+                      <button
+                        className="bg-[#0e6d55] text-white px-4 py-2 duration-300 rounded-lg hover:bg-green-900 outline-none flex items-center"
+                        onClick={() => handleUpdateRole(index)}
+                      >
+                        <FaPen className="mr-2" /> Update
+                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
               ))}
             </div>
           )}
