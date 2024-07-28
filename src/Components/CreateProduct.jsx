@@ -506,7 +506,7 @@ const CreateProduct = () => {
 
         <button
           type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 outline-none"
+          className="bg-[#1AC096] duration-300 text-white px-4 py-2 rounded-lg shadow hover:bg-[#169E7C] outline-none"
           disabled={loading}
         >
           {loading ? "Creating..." : "Create Product"}
