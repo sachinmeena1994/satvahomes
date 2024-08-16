@@ -206,7 +206,7 @@ const LoginSignup = () => {
               {isSignUp && (
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="bg-gray-200 mb-6 px-4 py-3 w-full rounded-lg text-gray-800 placeholder-gray-600 outline-none pr-10"

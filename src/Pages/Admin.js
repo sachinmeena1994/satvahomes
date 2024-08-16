@@ -1,27 +1,46 @@
-import React, { useState, useEffect } from 'react';
-import { collection, getDocs, updateDoc, doc ,query, where,} from 'firebase/firestore';
-import { fireDB } from '../firebase-config';
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import VendorDashboard from '../Components/VendorDashboard';
-import CreateProduct from '../Components/CreateProduct';
-import ProductManager from '../Components/ProductManager';
-import BulkUpload from '../Components/BulkUpload';
+import React, { useState, useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  query,
+  where,
+} from "firebase/firestore";
+import { fireDB } from "../firebase-config";
+import { FaChevronUp, FaChevronDown, FaUser, FaEnvelope, FaUserTag, FaPen} from "react-icons/fa";
+import VendorDashboard from "../Components/VendorDashboard";
+import CreateProduct from "../Components/CreateProduct";
+import ProductManager from "../Components/ProductManager";
+import BulkUpload from "../Components/BulkUpload";
+import {
+  FaUsers,
+  FaPlusCircle,
+  FaBullhorn,
+  FaBoxOpen,
+  FaUpload,
+} from "react-icons/fa";
+import { FaAd, FaProductHunt } from "react-icons/fa";
+
 
 function Admin() {
-  const [menuOption, setMenuOption] = useState('');
+  const [menuOption, setMenuOption] = useState("");
   const [users, setUsers] = useState([]);
   const [expandedUserIndex, setExpandedUserIndex] = useState(null);
   const [updatedUserIndex, setUpdatedUserIndex] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const usersCollection = collection(fireDB, 'users');
+      const usersCollection = collection(fireDB, "users");
       const usersSnapshot = await getDocs(usersCollection);
-      const usersData = usersSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const usersData = usersSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setUsers(usersData);
     };
 
-    if (menuOption === 'users') {
+    if (menuOption === "users") {
       fetchUsers();
     }
   }, [menuOption]);
@@ -34,21 +53,21 @@ function Admin() {
   };
   const handleUpdateRole = async (index) => {
     const userToUpdate = users[index];
-    const usersCollection = collection(fireDB, 'users');
-    const q = query(usersCollection, where('email', '==', userToUpdate.email));
-  
+    const usersCollection = collection(fireDB, "users");
+    const q = query(usersCollection, where("email", "==", userToUpdate.email));
+
     try {
       const querySnapshot = await getDocs(q);
       if (!querySnapshot.empty) {
         const userDoc = querySnapshot.docs[0].ref; // Get the document reference
         await updateDoc(userDoc, { role: userToUpdate.role });
-        alert('Role updated successfully!');
+        alert("Role updated successfully!");
       } else {
-        alert('User not found.');
+        alert("User not found.");
       }
     } catch (error) {
-      console.error('Error updating role: ', error);
-      alert('Failed to update role.');
+      console.error("Error updating role: ", error);
+      alert("Failed to update role.");
     }
     setUpdatedUserIndex(null); // Reset the updated user index after the update operation
   };
@@ -57,47 +76,115 @@ function Admin() {
   };
 
   return (
-    <div className="flex flex-row w-full border-opacity-50 min-h-screen">
-      <aside className="w-1/4 bg-gradient-to-r from-blue-400 to-blue-700 p-6 text-white" style={{ height: '100vh' }}>
-        <ul className="mt-4">
-          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'users' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('users')}>Users</li>
-          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'createProduct' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('createProduct')}>Create Product</li>
-          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'advertisement' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('advertisement')}>Vendor</li>
-          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'manageProducts' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('manageProducts')}>Manage Products</li>
-          <li className={`cursor-pointer py-2 px-4 rounded-lg mb-2 ${menuOption === 'bulkUpload' ? 'bg-blue-700' : 'hover:bg-blue-600'}`} onClick={() => setMenuOption('bulkUpload')}>Bulk Upload</li>
+    <div className="flex flex-row w-full border-opacity-50 h-screen">
+      <aside
+        className="w-1/4 bg-gradient-to-r from-[#0E6D55] to-[#1cca9e] p-6 text-white"
+        style={{ height: "100vh" }}
+      >
+        <ul className="mt-4 space-y-2">
+          <li
+            className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
+              menuOption === "users" ? "bg-[#174f41]" : "hover:bg-[#174f4166]"
+            }`}
+            onClick={() => setMenuOption("users")}
+          >
+            <FaUsers className="text-lg" />
+            <span>Users</span>
+          </li>
+          <li
+            className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
+              menuOption === "createProduct"
+                ? "bg-[#174f41]"
+                : "hover:bg-[#174f4166]"
+            }`}
+            onClick={() => setMenuOption("createProduct")}
+          >
+            <FaPlusCircle className="text-lg" />
+            <span>Create Product</span>
+          </li>
+          <li
+            className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
+              menuOption === "advertisement"
+                ? "bg-[#174f41]"
+                : "hover:bg-[#174f4166]"
+            }`}
+            onClick={() => setMenuOption("advertisement")}
+          >
+            <FaAd className="text-lg" />
+            <span>Vendor</span>
+          </li>
+          <li
+            className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
+              menuOption === "manageProducts"
+                ? "bg-[#174f41]"
+                : "hover:bg-[#174f4166]"
+            }`}
+            onClick={() => setMenuOption("manageProducts")}
+          >
+            <FaBoxOpen className="text-lg" />
+            <span>Manage Products</span>
+          </li>
+          <li
+            className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
+              menuOption === "bulkUpload"
+                ? "bg-[#174f41]"
+                : "hover:bg-[#174f4166]"
+            }`}
+            onClick={() => setMenuOption("bulkUpload")}
+          >
+            <FaUpload className="text-lg" />
+            <span>Bulk Upload</span>
+          </li>
         </ul>
       </aside>
-      <main className="w-3/4 bg-gray-50 p-6">
+
+      <main
+        className="w-3/4 overflow-y-auto  bg-gray-50 p-6"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
         <div>
-          {menuOption === 'users' && (
+          {menuOption === "users" && (
             <div>
               {users.map((user, index) => (
-                <div key={index} className="bg-white shadow-md rounded-lg p-6 mb-6 transition-transform transform hover:scale-102">
-                  <h3
-                    className="text-xl font-semibold cursor-pointer flex items-center justify-between"
-                    onClick={() => toggleUserDetails(index)}
-                  >
-                    Name: {user.name}
-                    {expandedUserIndex === index ? (
-                      <FaChevronUp className="ml-1" />
-                    ) : (
-                      <FaChevronDown className="ml-1" />
-                    )}
-                  </h3>
-                  <div className={expandedUserIndex === index ? 'block mt-4' : 'hidden'}>
-                    <div className="bg-gray-100 p-4 mb-4 rounded-lg">
-                      <h4 className="text-md font-semibold mb-2">Name:</h4>
-                      <p>{user.name}</p>
-                    </div>
-                    <div className="bg-gray-100 p-4 mb-4 rounded-lg">
-                      <h4 className="text-md font-semibold mb-2">Email:</h4>
-                      <p>{user.email}</p>
-                    </div>
-                    <div className="bg-gray-100 p-4 mb-4 rounded-lg">
-                      <h4 className="text-md font-semibold mb-2">Role:</h4>
-                      <div className="flex items-center">
+                <div
+                key={index}
+                className="bg-white shadow-lg border border-gray-200 rounded-lg p-6 mb-6 duration-200 transition-all transform hover:scale-102"
+              >
+                <h3
+                  className="text-xl font-semibold cursor-pointer flex items-center justify-between"
+                  onClick={() => toggleUserDetails(index)}
+                >
+                  <span className="flex items-center">
+                    <FaUser className="mr-2 text-[#0E6D55]" /> {user.name}
+                  </span>
+                  <FaChevronUp
+                    className={`ml-1 transition-transform ${
+                      expandedUserIndex === index ? "rotate-180 duration-300 text-[#0E6D55]" : "duration-500"
+                    }`}
+                  />
+                </h3>
+                <div
+                  className={`transition-max-height duration-500 ease-in-out overflow-hidden ${
+                    expandedUserIndex === index ? "max-h-screen mt-4" : "max-h-0"
+                  }`}
+                >
+                  <div className="bg-gray-50 flex items-center gap-2 p-4 mb-4 rounded-lg border border-gray-200">
+                    <FaUser className="text-[#0E6D55] mr-2" />
+                    <h4 className="text-md font-semibold">Name :</h4>
+                    <p>{user.name}</p>
+                  </div>
+                  <div className="bg-gray-50 flex items-center gap-2 p-4 mb-4 rounded-lg border border-gray-200">
+                    <FaEnvelope className="text-[#0E6D55] mr-2" />
+                    <h4 className="text-md font-semibold">Email :</h4>
+                    <p>{user.email}</p>
+                  </div>
+                  <div className="bg-gray-50 flex items-center gap-2 p-4 mb-4 rounded-lg border border-gray-200">
+                    <FaUserTag className="text-[#0E6D55] mr-2" />
+                    <h4 className="text-md font-semibold">Role :</h4>
+                    <div className="flex items-center">
+                      <div className="pl-2 pr-2 border border-gray-200 rounded-lg mr-2 bg-white">
                         <select
-                          className="border rounded-md py-2 px-3 mr-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          className="rounded-lg py-2 px-2 mr-4 border-none outline-none bg-white"
                           value={user.role}
                           onChange={(e) => handleEditRole(index, e.target.value)}
                         >
@@ -106,35 +193,36 @@ function Admin() {
                           <option value="vendor">Vendor</option>
                           <option value="designer">Designer</option>
                         </select>
-                        <button
-                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          onClick={() => handleUpdateRole(index)}
-                        >
-                          Update
-                        </button>
                       </div>
+                      <button
+                        className="bg-[#0e6d55] text-white px-4 py-2 duration-300 rounded-lg hover:bg-green-900 outline-none flex items-center"
+                        onClick={() => handleUpdateRole(index)}
+                      >
+                        <FaPen className="mr-2" /> Update
+                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
               ))}
             </div>
           )}
-          {menuOption === 'advertisement' && (
+          {menuOption === "advertisement" && (
             <div>
               <VendorDashboard />
             </div>
           )}
-          {menuOption === 'createProduct' && (
+          {menuOption === "createProduct" && (
             <div>
               <CreateProduct />
             </div>
           )}
-          {menuOption === 'manageProducts' && (
+          {menuOption === "manageProducts" && (
             <div>
               <ProductManager />
             </div>
           )}
-          {menuOption === 'bulkUpload' && (
+          {menuOption === "bulkUpload" && (
             <div>
               <BulkUpload />
             </div>

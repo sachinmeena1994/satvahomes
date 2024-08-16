@@ -182,7 +182,7 @@ const Testheader = () => {
             onClick={handleLogout}
             className=""
           >
-            <BsPersonCircle className="block hover:text-[#056E55] text-zinc-700 duration-200 md:hidden text-2xl" />
+            <BsPersonCircle className="block hover:text-[#056E55] text-zinc-700 duration-200 lg:hidden text-2xl" />
 
           </button>}
 
@@ -220,13 +220,13 @@ const Testheader = () => {
           {/* Admin and Logout Buttons */}
           {user!=null && <Link
             to="/admin"
-            className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
+            className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 lg:flex lg:gap-[2px] lg:items-center"
           >
             <h1 className="text-md mb-[1px] font-semibold">Admin</h1>
           </Link>}
           {user!=null && <button
             onClick={handleLogout}
-            className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 md:flex lg:gap-[2px] lg:items-center"
+            className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 lg:flex lg:gap-[2px] lg:items-center"
           >
             <h1 className="text-md mb-[1px] font-semibold">Logout</h1>
           </button>}
