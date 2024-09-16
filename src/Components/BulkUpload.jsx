@@ -6,8 +6,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 const BulkUpload = () => {
   const [csvData, setCsvData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [imageFiles, setImageFiles] = useState([]);
-  const [imageUrls, setImageUrls] = useState([]);
+  const [imageUploadsInProgress, setImageUploadsInProgress] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -19,23 +18,47 @@ const BulkUpload = () => {
     });
   };
 
-  const handleImageFilesChange = (e) => {
-    setImageFiles(Array.from(e.target.files));
-  };
-
-  const handleImageUpload = async () => {
+  const handleImageFilesChange = async (e, rowIndex) => {
+    setImageUploadsInProgress(true);
+    const files = Array.from(e.target.files);
     const storage = getStorage();
     const uploadedUrls = [];
 
-    for (const imageFile of imageFiles) {
-      const storageRef = ref(storage, `images/${Date.now()}-${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
+    for (const file of files) {
+      const storageRef = ref(storage, `images/${Date.now()}-${file.name}`);
+      await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
-      uploadedUrls.push(downloadURL);
+      uploadedUrls.push({ name: file.name, url: downloadURL });
     }
 
-    setImageUrls(uploadedUrls);
-    alert("Images uploaded successfully!");
+    const updatedCsvData = [...csvData];
+    const row = updatedCsvData[rowIndex];
+
+    uploadedUrls.forEach((uploadedImage) => {
+      const fileNameParts = uploadedImage.name.split(".");
+      const imageType = fileNameParts[1]; // Extract the image type (e.g., IMAGE STEP 1)
+
+      if (imageType === "IMAGE COVER PAGE") {
+        row["@IMAGE COVER PAGE"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 1") {
+        row["@IMAGE STEP 1"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 2") {
+        row["@IMAGE STEP 2"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 3") {
+        row["@IMAGE STEP 3"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 4") {
+        row["@IMAGE STEP 4"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 5") {
+        row["@IMAGE STEP 5"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 6") {
+        row["@IMAGE STEP 6"] = uploadedImage.url;
+      } else if (imageType === "IMAGE STEP 7") {
+        row["@IMAGE STEP 7"] = uploadedImage.url;
+      }
+    });
+
+    setCsvData(updatedCsvData);
+    setImageUploadsInProgress(false); // Image upload completed
   };
 
   const handleInputChange = (index, key, value) => {
@@ -44,14 +67,9 @@ const BulkUpload = () => {
     setCsvData(updatedData);
   };
 
-  const handleAddRow = () => {
-    const newRow = {};
-    if (csvData.length > 0) {
-      Object.keys(csvData[0]).forEach((key) => {
-        newRow[key] = "";
-      });
-    }
-    setCsvData([...csvData, newRow]);
+  const handleRemoveRow = (index) => {
+    const updatedData = csvData.filter((_, rowIndex) => rowIndex !== index);
+    setCsvData(updatedData);
   };
 
   const handleSubmit = async (e) => {
@@ -101,16 +119,8 @@ const BulkUpload = () => {
           ],
         };
 
-        if (typeof productData.category !== "string") {
-          console.error("Invalid category:", productData.category);
-          continue;
-        }
-
         const categoryDocRef = doc(db, `products/POOJA UNIT`);
-        const subCollectionRef = collection(
-          categoryDocRef,
-          productData.category
-        );
+        const subCollectionRef = collection(categoryDocRef, productData.category);
         await setDoc(doc(subCollectionRef), productData);
       } catch (error) {
         console.error("Error uploading product:", error);
@@ -134,51 +144,11 @@ const BulkUpload = () => {
 
   return (
     <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">
-        Bulk Upload Products
-      </h2>
-
-      {/* Image Upload Section */}
-      <div className="mb-6">
-        <label className="block mb-2 text-sm font-medium text-zinc-700">
-          Upload Images
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={handleImageFilesChange}
-          className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
-        />
-        <button
-          type="button"
-          onClick={handleImageUpload}
-          className="bg-[#056E55] mb-3 mt-3 text-white px-4 py-2 rounded-lg shadow duration-300 hover:bg-[#174f41]"
-          disabled={loading}
-        >
-          Upload Images
-        </button>
-        {imageUrls.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Uploaded Image URLs:
-            </h3>
-            <ul className="list-disc pl-5">
-              {imageUrls.map((url, index) => (
-                <li key={index} className="text-sm text-gray-600">
-                  {url}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      <h2 className="text-2xl font-bold mb-6 text-gray-700">Bulk Upload Products</h2>
 
       {/* CSV Upload Section */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700">
-          Upload CSV
-        </label>
+        <label className="block text-sm font-medium text-gray-700">Upload CSV</label>
         <input
           type="file"
           accept=".csv"
@@ -194,48 +164,55 @@ const BulkUpload = () => {
         </button>
       </div>
 
-      {/* CSV Data Table */}
+      {/* CSV Data Table with Image Upload Option */}
       {csvData.length > 0 && (
         <div className="overflow-x-auto mb-6">
-          <table className="min-w-full bg-white border">
-            <thead>
+          <table className="min-w-full bg-white border-collapse border">
+            <thead className="bg-gray-100">
               <tr>
+                <th className="py-3 px-6 border text-left text-sm text-gray-700">Upload Images</th>
                 {Object.keys(csvData[0]).map((key) => (
-                  <th
-                    key={key}
-                    className="py-2 px-4 border-b text-left text-sm text-gray-700"
-                  >
+                  <th key={key} className="py-3 px-4 border text-left text-sm text-gray-700">
                     {key}
                   </th>
                 ))}
+                <th className="py-3 px-4 border text-left text-sm text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {csvData.map((row, index) => (
-                <tr key={index}>
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="py-2 px-6 border">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleImageFilesChange(e, index)}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
+                    />
+                  </td>
                   {Object.keys(row).map((key) => (
-                    <td key={key} className="py-2 px-4 border-b">
+                    <td key={key} className="py-2 px-4 border">
                       <input
                         type="text"
                         value={row[key]}
-                        onChange={(e) =>
-                          handleInputChange(index, key, e.target.value)
-                        }
+                        onChange={(e) => handleInputChange(index, key, e.target.value)}
                         className="w-full border-none focus:ring-0 text-sm text-gray-800"
                       />
                     </td>
                   ))}
+                  <td className="py-2 px-4 border">
+                    <button
+                      onClick={() => handleRemoveRow(index)}
+                      className="bg-red-500 text-white px-4 py-1 rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                    >
+                      Remove Row
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button
-            type="button"
-            onClick={handleAddRow}
-            className="bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 mt-4"
-          >
-            Add Row
-          </button>
         </div>
       )}
 
@@ -244,7 +221,7 @@ const BulkUpload = () => {
         <button
           type="submit"
           className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-          disabled={loading}
+          disabled={loading || imageUploadsInProgress}
         >
           {loading ? "Uploading..." : "Upload Products"}
         </button>

@@ -5,26 +5,12 @@ import { useProductCategory } from "../Context/Product-Category-Context"; // Adj
 const CategoriesLinks = () => {
   const { categories, loading } = useProductCategory();
 
-  // Define a mapping of category names to image URLs
-  const categoryImages = {
-    "Shoe Rack": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-12-768x768.jpeg",
-    "TV": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-1024x1024.jpeg",
-    "Partition Unit": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-8-1024x1024.jpeg",
-    "Wall Panel": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-10-1024x1024.jpeg",
-    "Pooja Unit": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-18-1024x1024.jpeg",
-    "Bar Unit": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-1-1024x1024.jpeg",
-    "Crockery Unit": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-21-768x768.jpeg",
-    "Dressing Table Unit": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-9-768x768.jpeg",
-    "Study Table Unit": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-17-768x768.jpeg",
-    "Wardobe": "https://satvahomes.com/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-11-at-19.51.21-3-768x768.jpeg"
-  };
-
-  // Define a default image for categories that don't have a specific image
-  const defaultImage = "https://satvahomes.com/wp-content/uploads/2024/03/default-image.jpeg";
-
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  // Debugging: Log categories to check their structure
+  console.log("Categories:", categories);
 
   return (
     <div className="mt-20 mx-3">
@@ -36,13 +22,13 @@ const CategoriesLinks = () => {
         <div className="flex justify-center mt-12 flex-col gap-10 md:flex-row md:flex-wrap md:gap-5 w-full">
           {categories.map((category) => (
             <Link
-              to={`/product-category/${category}`}
-              key={category}
+              to={`/product-category/${category.name}`}
+              key={category.name} // Ensure 'name' is unique
               className="w-full bg-[#0C3C30] flex-shrink-0 md:w-[17%]"
             >
               <img
-                src={categoryImages[category] || defaultImage}
-                alt={category}
+                src={category.logo} // Ensure 'logo' is a valid URL or path
+                alt={category.name} // Good use of 'name' for accessibility
               />
             </Link>
           ))}

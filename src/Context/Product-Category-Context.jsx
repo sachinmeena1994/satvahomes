@@ -18,8 +18,8 @@ export const ProductCategoryProvider = ({ children }) => {
         const db = getFirestore();
         const categoriesCollection = collection(db, "products");
         const categoriesSnapshot = await getDocs(categoriesCollection);
-        const categoriesData = categoriesSnapshot.docs.map((doc) => doc.id);
-        setCategories(categoriesData);
+        const categoriesData = categoriesSnapshot.docs.map((doc) => doc.data());
+        setCategories(categoriesData);  
       } catch (error) {
         console.error("Error fetching categories:", error);
       } finally {

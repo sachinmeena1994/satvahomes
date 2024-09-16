@@ -73,11 +73,11 @@ export default function CategorySwiper() {
             <Link>
               <img
                 className="h-[80%] w-[100%] object-cover transition-transform duration-500 ease-in-out transform hover:scale-105"
-                src={categoryImages[category]}
+                src={category.logo}
                 alt=""
               />
               <h1 className="h-[50px] md:h-[20%] font-bold text-xl text-zinc-600 flex justify-center items-center z-2 relative bg-white">
-                {category}
+                {category.name}
               </h1>
             </Link>
             </SwiperSlide>

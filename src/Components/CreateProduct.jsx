@@ -4,18 +4,21 @@ import {
   collection,
   doc,
   setDoc,
-  getDocs,
+  getDocs ,updateDoc, arrayUnion
 } from "firebase/firestore";
+
+import { useProductCategory } from "../Context/Product-Category-Context";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const CreateProduct = () => {
+  const {categories} = useProductCategory()
   const [productDetails, setProductDetails] = useState({
     name: "",
     description: "",
     productImages: [],
     category: "",
   });
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const [pdfDetails, setPdfDetails] = useState([
     { size: "small", materialInfo: {}, steps: [] },
     { size: "medium", materialInfo: {}, steps: [] },
@@ -62,17 +65,7 @@ const CreateProduct = () => {
     legs: "(if any).",
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const db = getFirestore();
-      const categoriesCollection = collection(db, "products");
-      const categoriesSnapshot = await getDocs(categoriesCollection);
-      const categoriesData = categoriesSnapshot.docs.map((doc) => doc.id);
-      setCategories(categoriesData);
-    };
 
-    fetchCategories();
-  }, []);
 
   const handleProductImagesChange = (e) => {
     const files = Array.from(e.target.files);
@@ -126,40 +119,46 @@ const CreateProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     const db = getFirestore();
     const productData = { ...productDetails, productImages: [] };
     const pdfData = [...pdfDetails];
-
+  
+    // Upload product images
     for (const image of productDetails.productImages) {
       const imageUrl = await uploadImage(image);
       productData.productImages.push(imageUrl);
     }
-
+  
+    // Upload PDF step images
     for (let i = 0; i < pdfData.length; i++) {
       for (let j = 0; j < pdfData[i].steps.length; j++) {
         if (pdfData[i].steps[j].image) {
-          pdfData[i].steps[j].image = await uploadImage(
-            pdfData[i].steps[j].image
-          );
+          pdfData[i].steps[j].image = await uploadImage(pdfData[i].steps[j].image);
         }
       }
     }
-
+  
+    // Add the product data into the array inside the category document
     const categoryDocRef = doc(db, `products/${productDetails.category}`);
-    const subCollectionRef = collection(
-      categoryDocRef,
-      productDetails.category
-    );
-    await setDoc(doc(subCollectionRef), {
-      ...productData,
-      pdfDetails: pdfData,
-    });
-
-    setLoading(false);
-    alert("Product created successfully!");
+  
+    try {
+      await updateDoc(categoryDocRef, {
+        products: arrayUnion({
+          ...productData,
+          pdfDetails: pdfData,
+          productDispaly:false
+        }),
+      });
+      setLoading(false);
+      alert("Product added successfully!");
+    } catch (error) {
+      setLoading(false);
+      console.error("Error adding product: ", error);
+      alert("Error adding product.");
+    }
   };
-
+  
   return (
     <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-700">Create Product</h2>
@@ -213,7 +212,7 @@ const CreateProduct = () => {
           </label>
           <div className="pr-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none">
             <select
-              value={productDetails.category}
+              value={productDetails.name}
               onChange={(e) =>
                 setProductDetails({
                   ...productDetails,
@@ -224,8 +223,8 @@ const CreateProduct = () => {
             >
               <option value="">Select a category</option>
               {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+                <option key={category.id} value={category.name}>
+                  {category.name}
                 </option>
               ))}
             </select>
@@ -262,77 +261,7 @@ const CreateProduct = () => {
                 <label className="block mb-3 text-sm font-medium text-zinc-700">
                   Material Information
                 </label>
-                {/* <table className="mt-2 w-full ">
-                  <thead className="">
-                    <tr>
-                      <th className="border px-4 py-2">Material</th>
-                      <th className="border px-4 py-2">Small</th>
-                      <th className="border px-4 py-2">Medium</th>
-                      <th className="border px-4 py-2">Large</th>
-                      <th className="border px-4 py-2">Description</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {materialKeys.map((material) => (
-                      <tr key={material}>
-                        <td className="border px-4 py-2">
-                          {material.toUpperCase().replace(/_/g, " ")}
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={
-                              pdfDetails[0].materialInfo[material]?.value || ""
-                            }
-                            onChange={(e) =>
-                              handleMaterialInfoChange(
-                                "small",
-                                material,
-                                parseFloat(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={
-                              pdfDetails[1].materialInfo[material]?.value || ""
-                            }
-                            onChange={(e) =>
-                              handleMaterialInfoChange(
-                                "medium",
-                                material,
-                                parseFloat(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          <input
-                            type="number"
-                            value={
-                              pdfDetails[2].materialInfo[material]?.value || ""
-                            }
-                            onChange={(e) =>
-                              handleMaterialInfoChange(
-                                "large",
-                                material,
-                                parseFloat(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                          />
-                        </td>
-                        <td className="border px-4 py-2">
-                          {materialDescriptions[material]}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table> */}
+             
                 <table className="mt-4 w-full table-auto border-collapse overflow-hidden shadow-lg rounded-lg">
                   <thead>
                     <tr className="bg-[#056E55] text-white text-left">

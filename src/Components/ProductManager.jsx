@@ -84,7 +84,7 @@
           >
             <option value="">Select a category</option>
             {categories.map((category) => (
-              <option key={category} value={category}>{category}</option>
+              <option key={category.nam} value={category.name}>{category.name}</option>
             ))}
           </select>
         </div>
