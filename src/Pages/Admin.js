@@ -26,25 +26,14 @@ import {
 
 function Admin() {
   const currentUser = useUser();
-
   const [menuOption, setMenuOption] = useState(""); // Start with an empty string
   const [users, setUsers] = useState([]);
   const [expandedUserIndex, setExpandedUserIndex] = useState(null);
   const [updatedUserIndex, setUpdatedUserIndex] = useState(null);
 
-  // UseEffect to set the menu option after currentUser is available
-  useEffect(() => {
-    const getInitialMenuOption = () => {
-      if (currentUser.userDetails?.role === "admin") return "users";
-      if (currentUser.userDetails?.role === "designer") return "createProduct";
-      if (currentUser.userDetails?.role === "vendor") return "advertisement";
-      return "default"; // Fallback in case the role doesn't match any of the conditions
-    };
 
-    setMenuOption(getInitialMenuOption());
-  }, [currentUser]); // Run this effect when currentUser changes
-
-  useEffect(() => {
+  useEffect(
+    () => {
     const fetchUsers = async () => {
       const usersCollection = collection(fireDB, "users");
       const usersSnapshot = await getDocs(usersCollection);
@@ -56,6 +45,21 @@ function Admin() {
     };
     fetchUsers();
   }, []);
+
+
+  // UseEffect to set the menu option after currentUser is available
+  useEffect(() => {
+    const getInitialMenuOption = () => {
+      if (currentUser.userDetails?.role === "admin") return "users";
+      if (currentUser.userDetails?.role === "designer") return "createProduct";
+      if (currentUser.userDetails?.role === "vendor") return "advertisement";
+      return "default"; // Fallback in case the role doesn't match any of the conditions
+    };
+
+    setMenuOption(getInitialMenuOption());
+  }, [currentUser]); 
+
+
 
   const handleEditRole = (index, newRole) => {
     const updatedUsers = [...users];
@@ -89,6 +93,9 @@ function Admin() {
     setExpandedUserIndex(index === expandedUserIndex ? null : index);
   };
 
+
+
+  
   return (
     <div className="flex flex-row w-full border-opacity-50 h-screen">
       <aside
@@ -128,7 +135,7 @@ function Admin() {
               <span>Create Product</span>
             </li>
           }
-          {currentUser.userDetails?.role === "vendor" &&
+          {currentUser.userDetails?.role === "vendor" || currentUser.userDetails?.role === "admin" &&
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
                 menuOption === "advertisement"

@@ -1,25 +1,17 @@
   import React, { useState, useEffect } from 'react';
   import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
   import { toast } from 'react-toastify';
-
+  import { useProductCategory } from '../Context/Product-Category-Context';
   const ProductManager = () => {
-    const [categories, setCategories] = useState([]);
+    const { categories, loading } = useProductCategory();
+    // const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [products, setProducts] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null);
     const [deletingProduct, setDeletingProduct] = useState(null);
     const db = getFirestore();
 
-    useEffect(() => {
-      const fetchCategories = async () => {
-        const categoriesCollection = collection(db, "products");
-        const categoriesSnapshot = await getDocs(categoriesCollection);
-        const categoriesData = categoriesSnapshot.docs.map((doc) => doc.id);
-        setCategories(categoriesData);
-      };
-
-      fetchCategories();
-    }, [db]);
+  
 
     useEffect(() => {
       if (selectedCategory) {
@@ -80,11 +72,16 @@
           <select 
             className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
             value={selectedCategory} 
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              const selectedIndex =e.target.value;
+                
+                setSelectedCategory(selectedIndex)
+              }
+            }
           >
             <option value="">Select a category</option>
             {categories.map((category) => (
-              <option key={category.nam} value={category.name}>{category.name}</option>
+              <option key={category.id} value={category.id} id>{category.name}</option>
             ))}
           </select>
         </div>

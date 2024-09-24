@@ -12,6 +12,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const CreateProduct = () => {
   const {categories} = useProductCategory()
+  const [selectedCategory, setSelectedCategory] = useState("")
   const [productDetails, setProductDetails] = useState({
     name: "",
     description: "",
@@ -140,7 +141,9 @@ const CreateProduct = () => {
     }
   
     // Add the product data into the array inside the category document
-    const categoryDocRef = doc(db, `products/${productDetails.category}`);
+  
+    
+    const categoryDocRef = doc(db, `products/${selectedCategory}`);
   
     try {
       await updateDoc(categoryDocRef, {
@@ -213,17 +216,20 @@ const CreateProduct = () => {
           <div className="pr-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none">
             <select
               value={productDetails.name}
-              onChange={(e) =>
+              onChange={(e) =>{
                 setProductDetails({
                   ...productDetails,
                   category: e.target.value,
                 })
-              }
+                const selectedIndex =e.target.value;
+                setSelectedCategory(selectedIndex)
+                
+              }}
               className="bg-gray-50 border-none text-gray-900 text-sm block w-full outline-none"
             >
               <option value="">Select a category</option>
               {categories.map((category) => (
-                <option key={category.id} value={category.name}>
+                <option key={category.id} value={category.id} id={category.id}>
                   {category.name}
                 </option>
               ))}
