@@ -1,5 +1,5 @@
   import React, { useState, useEffect } from 'react';
-  import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+  import { getFirestore, collection, getDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
   import { toast } from 'react-toastify';
   import { useProductCategory } from '../Context/Product-Category-Context';
   const ProductManager = () => {
@@ -16,16 +16,30 @@
     useEffect(() => {
       if (selectedCategory) {
         const fetchProducts = async () => {
-          const productsCollection = collection(db, `products/${selectedCategory}/${selectedCategory}`);
-          const productsSnapshot = await getDocs(productsCollection);
-          const productsData = productsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setProducts(productsData);
+          try {
+            const productDocRef = doc(db, `products`, selectedCategory); // Reference to the document
+            const productSnapshot = await getDoc(productDocRef);
+    
+            if (productSnapshot.exists()) {
+              // If the document exists, get its data
+              const productData = { id: productSnapshot.id, ...productSnapshot.data() };
+              if(productData.products){
+                setProducts(productData.products);
+              }
+   
+            } else {
+              console.log("No such document!");
+              setProducts([]); // Clear products if no document found
+            }
+          } catch (error) {
+            console.error("Error fetching document:", error);
+          }
         };
-
+    
         fetchProducts();
       }
-    }, [selectedCategory, db]);
-
+    }, [selectedCategory,db]);
+    
     const handleDelete = async (productId) => {
       try {
         await deleteDoc(doc(db, `products/${selectedCategory}/${selectedCategory}`, productId));
