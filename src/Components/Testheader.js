@@ -20,9 +20,12 @@
     };
 
     const handleCategoryChange = (e) => {
-      const selectedCategory = e.target.value;
-      if (selectedCategory) {
-        navigate(`/product-category/${selectedCategory}`);
+      const selectedValue = e.target.value;
+      setSelectedCategory(selectedValue);
+      
+      // Directly use selectedValue to navigate
+      if (selectedValue && selectedValue !== "-1") {
+        navigate(`/product-category/${selectedValue}`);
       }
     };
 
@@ -108,9 +111,9 @@
                     name="categories"
                     id="categories"
                     onChange={handleCategoryChange}
-                    value={selectedCategory}
+                    // value={selectedCategory}
                   >
-                    <option className="text-gray-700 text-xl font-semibold" value="">
+                    <option className="text-gray-700 text-xl font-semibold" value="-1">
                       Categories
                     </option>
                     {categories.map((category) => (
@@ -203,14 +206,14 @@
           onChange={handleCategoryChange}
           value={selectedCategory}
         >
-          <option className="text-zinc-700" value="">
+          <option className="text-zinc-700" value="-1">
             Select a Category
           </option>
           {categories.map((category) => (
             <option
               className="text-zinc-700"
               key={category.id}  // Assuming each category has a unique ID.
-              value={category.name}  // Set the option value to the category name.
+              value={category.id}  // Set the option value to the category name.
             >
               {category.name}  
             </option>

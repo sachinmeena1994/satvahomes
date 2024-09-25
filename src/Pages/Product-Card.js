@@ -19,14 +19,25 @@ function ProductCard() {
     const fetchProduct = async () => {
       try {
         const db = getFirestore();
-        const productDocRef = doc(db, `products/${category}/${category}/${productId}`);
+        // Fetch the document from 'products/${category}'
+        const productDocRef = doc(db, `products/${category}`);
         const productDoc = await getDoc(productDocRef);
-
+  
         if (productDoc.exists()) {
           const productData = productDoc.data();
-          setProduct(productData);
-          if (productData.productImages && productData.productImages.length > 0) {
-            setSelectedImage(productData.productImages[0]);
+  
+          // Find the product in the 'products' array using the productId
+          const targetProduct = productData.products.find(
+            (product) => product.id === productId
+          );
+  
+          if (targetProduct) {
+            setProduct(targetProduct);
+            if (targetProduct.productImages && targetProduct.productImages.length > 0) {
+              setSelectedImage(targetProduct.productImages[0]);
+            }
+          } else {
+            console.log("Product not found in the array!");
           }
         } else {
           console.log("No such document!");
@@ -37,7 +48,7 @@ function ProductCard() {
         setLoading(false);
       }
     };
-
+  
     const fetchAdvertisementData = async () => {
       try {
         const db = getFirestore();
@@ -49,12 +60,13 @@ function ProductCard() {
         console.error("Error fetching advertisement data:", error);
       }
     };
-
+  
     if (category && productId) {
       fetchProduct();
       fetchAdvertisementData();
     }
   }, [category, productId]);
+  
 
   const handleDownloadPDF = async () => {
     try {

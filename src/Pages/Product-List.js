@@ -78,7 +78,7 @@ function ProductList() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6">
           {products.map((product) => (
             <div
-              key={product.id}
+              key={product.category}
               style={{ cursor: "pointer" }}
               onClick={() => handleProductClick(product.id)}
             >
