@@ -26,13 +26,19 @@ const VendorDashboard = () => {
     name: "",
     advertise: "",
     location: { state: "", city: [] },
+<<<<<<< HEAD
     
+=======
+>>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
   });
   const [newAd, setNewAd] = useState({
     name: "",
     advertise: "",
     location: { state: "", city: [] },
+<<<<<<< HEAD
     
+=======
+>>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
   });
 
   useEffect(() => {
@@ -85,7 +91,10 @@ const VendorDashboard = () => {
       name: "",
       advertise: "",
       location: { state: "", city: [] },
+<<<<<<< HEAD
       
+=======
+>>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
     });
 
     toast.success("Advertisement updated successfully");
@@ -97,7 +106,10 @@ const VendorDashboard = () => {
       name: ad.name,
       advertise: ad.advertise,
       location: ad.location,
+<<<<<<< HEAD
       
+=======
+>>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
     });
     setSelectedAd(ad.id);
     setIsEditing(true);
@@ -138,7 +150,10 @@ const VendorDashboard = () => {
             name: "",
             advertise: "",
             location: { state: "", city: [] },
+<<<<<<< HEAD
             
+=======
+>>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
           });
 
           toast.success("Advertisement added successfully");
@@ -338,4 +353,8 @@ const VendorDashboard = () => {
   );
 };
 
+<<<<<<< HEAD
 export default VendorDashboard;
+=======
+export default VendorDashboard;
+>>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
