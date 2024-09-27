@@ -283,13 +283,8 @@ const CreateProduct = () => {
                 <table className="mt-4 w-full table-auto border-collapse overflow-hidden shadow-lg rounded-lg">
                   <thead>
                     <tr className="bg-[#056E55] text-white text-left">
-<<<<<<< HEAD
-                      <th className="px-4 py-3">Name</th>
-                      <th className="px-4 py-3">Location</th>
-=======
                       <th className="px-4 py-3">Material</th>
                       <th className="px-4 py-3">Small</th>
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
                       <th className="px-4 py-3">Medium</th>
                       <th className="px-4 py-3">Large</th>
                       <th className="px-4 py-3">Description</th>

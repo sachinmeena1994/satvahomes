@@ -23,10 +23,6 @@ import {
   FaUpload,
   FaAd
 } from "react-icons/fa";
-<<<<<<< HEAD
-import ManageVendors from "../Components/ManageVendors";
-=======
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
 
 function Admin() {
   const currentUser = useUser();
@@ -107,11 +103,7 @@ function Admin() {
         style={{ height: "100vh" }}
       >
         <ul className="mt-4 space-y-2">
-<<<<<<< HEAD
-          {currentUser.userDetails?.role === "user" &&
-=======
           {currentUser.userDetails?.role === "admin" &&
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
           <>
             <li className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
               menuOption === "productCategory" ? "bg-[#174f41]" : "hover:bg-[#174f4166]"
@@ -130,11 +122,7 @@ function Admin() {
             </li>
             </>
           }
-<<<<<<< HEAD
-          {(currentUser.userDetails?.role === "user" || currentUser.userDetails?.role === "designer") &&
-=======
           {(currentUser.userDetails?.role === "admin" || currentUser.userDetails?.role === "designer") &&
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
                 menuOption === "createProduct"
@@ -159,11 +147,7 @@ function Admin() {
               <FaAd className="text-lg" />
               <span>Vendor</span>
             </li>}
-<<<<<<< HEAD
-          {currentUser.userDetails?.role === "user" &&
-=======
           {currentUser.userDetails?.role === "admin" &&
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
                 menuOption === "manageProducts"
@@ -175,11 +159,7 @@ function Admin() {
               <FaBoxOpen className="text-lg" />
               <span>Manage Products</span>
             </li>}
-<<<<<<< HEAD
-          {(currentUser.userDetails?.role === "user" || currentUser.userDetails?.role === "designer") &&
-=======
           {(currentUser.userDetails?.role === "admin" || currentUser.userDetails?.role === "designer") &&
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
                 menuOption === "bulkUpload"
@@ -190,24 +170,8 @@ function Admin() {
             >
               <FaUpload className="text-lg" />
               <span>Bulk Upload</span>
-<<<<<<< HEAD
-            </li>}
-            {currentUser.userDetails?.role === "user" &&
-            <li
-              className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
-                menuOption === "manageProducts"
-                  ? "bg-[#174f41]"
-                  : "hover:bg-[#174f4166]"
-              }`}
-              onClick={() => setMenuOption("manageVendors")}
-            >
-              <FaBoxOpen className="text-lg" />
-              <span>Manage Vendors</span>
-            </li>}
-=======
             </li>
           }
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
         </ul>
       </aside>
 
@@ -303,10 +267,6 @@ function Admin() {
           {menuOption === "createProduct" && <CreateProduct />}
           {menuOption === "manageProducts" && <ProductManager />}
           {menuOption === "bulkUpload" && <BulkUpload />}
-<<<<<<< HEAD
-          {menuOption === "manageVendors" && <ManageVendors />}
-=======
->>>>>>> ca17f1661dedff42ae3d1d4833ea6d42fbe3a1e8
         </div>
       </main>
     </div>
