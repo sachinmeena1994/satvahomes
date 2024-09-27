@@ -70,7 +70,7 @@ function ProductCard() {
   const handleDownloadPDF = async () => {
     try {
       setLoading(true);
-      const templateUrl = '/TEMPLATE.pdf'; // Update this to the correct URL for your PDF template
+      const templateUrl = '/TEMPx LATE.pdf'; // Update this to the correct URL for your PDF template
       const response = await fetch(templateUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch PDF template: ${response.statusText}`);
