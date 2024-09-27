@@ -19,14 +19,25 @@ function ProductCard() {
     const fetchProduct = async () => {
       try {
         const db = getFirestore();
-        const productDocRef = doc(db, `products/${category}/${category}/${productId}`);
+        // Fetch the document from 'products/${category}'
+        const productDocRef = doc(db, `products/${category}`);
         const productDoc = await getDoc(productDocRef);
-
+  
         if (productDoc.exists()) {
           const productData = productDoc.data();
-          setProduct(productData);
-          if (productData.productImages && productData.productImages.length > 0) {
-            setSelectedImage(productData.productImages[0]);
+  
+          // Find the product in the 'products' array using the productId
+          const targetProduct = productData.products.find(
+            (product) => product.id === productId
+          );
+  
+          if (targetProduct) {
+            setProduct(targetProduct);
+            if (targetProduct.productImages && targetProduct.productImages.length > 0) {
+              setSelectedImage(targetProduct.productImages[0]);
+            }
+          } else {
+            console.log("Product not found in the array!");
           }
         } else {
           console.log("No such document!");
@@ -37,7 +48,7 @@ function ProductCard() {
         setLoading(false);
       }
     };
-
+  
     const fetchAdvertisementData = async () => {
       try {
         const db = getFirestore();
@@ -49,13 +60,13 @@ function ProductCard() {
         console.error("Error fetching advertisement data:", error);
       }
     };
-
+  
     if (category && productId) {
       fetchProduct();
       fetchAdvertisementData();
     }
   }, [category, productId]);
-
+  
   const handleDownloadPDF = async () => {
     try {
       setLoading(true);
@@ -65,32 +76,28 @@ function ProductCard() {
         throw new Error(`Failed to fetch PDF template: ${response.statusText}`);
       }
       const existingPdfBytes = await response.arrayBuffer();
-
+  
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const newPdfDoc = await PDFDocument.create();
-
+  
       const addPageWithTemplate = async () => {
         const [templatePage] = await newPdfDoc.copyPages(pdfDoc, [0]);
         newPdfDoc.addPage(templatePage);
         return newPdfDoc.getPage(newPdfDoc.getPageCount() - 1);
       };
-
+  
       let currentPage = await addPageWithTemplate();
-
+  
       const addText = (text, x, y, fontSize = 12, lineHeight = 1.2) => {
-    
-        
-          currentPage.drawText(text, { x, y, size: fontSize, color: rgb(0, 0, 0), maxWidth: 200 });
-        
+        currentPage.drawText(text, { x, y, size: fontSize, color: rgb(0, 0, 0), maxWidth: 200 });
       };
-      
-
+  
       const addImage = async (imageUrl, x, y, width, height) => {
         try {
           const imgResponse = await fetch(imageUrl);
           const imgBytes = await imgResponse.arrayBuffer();
           const mimeType = imgResponse.headers.get('content-type');
-
+  
           let img;
           if (mimeType === 'image/jpeg' || mimeType === 'image/jpg') {
             img = await newPdfDoc.embedJpg(imgBytes);
@@ -104,113 +111,18 @@ function ProductCard() {
           console.error(`Error embedding image from URL ${imageUrl}:`, error);
         }
       };
-
-      // First page: Product image and basic details
-      if (product && product.productImages && product.productImages.length > 0) {
-        await addImage(product.productImages[0], 50, 100, 700, 600);
-      }
-      // addText(`Name: ${product.name}`, 100, 150, 20);
-      // addText(`Description: ${product.description}`, 0, 100, 10);
-
-      // Add footer with UNIT NAME on the first page
-      addText(`${product.name}`, 85, 30, 12);
-
-      // Second page: Material information in table format
-      currentPage = await addPageWithTemplate();
-      let yPosition = 550;
-      addText("Material Information", 350, yPosition, 20);
-      yPosition -= 30;
-
-      const materialInfo = product.pdfDetails[0].materialInfo;
-      let tableStartX = 20;
-      let tableStartY = yPosition;
-      let tableWidth = 800;
-      let rowHeight = 15;
-      let tableHeight = rowHeight * Object.keys(materialInfo).length;
-
-      // Draw table borders and headers
-      currentPage.drawRectangle({
-        x: tableStartX,
-        y: tableStartY - tableHeight - 10,
-        width: tableWidth,
-        height: tableHeight + rowHeight,
-        borderColor: rgb(0, 0.6, 0), // Green color
-        borderWidth: 2,
-      });
-
-      yPosition = tableStartY - rowHeight;
-
-      // Draw table rows
-      Object.keys(materialInfo).forEach(key => {
-        addText(key.replace(/([A-Z])/g, ' $1').toUpperCase(), tableStartX + 5, yPosition);
-        addText(materialInfo[key].value ? materialInfo[key].value.toString() : '', tableStartX + tableWidth / 2 + 5, yPosition);
-        yPosition -= rowHeight;
-      });
-
-      // Add the biggest advertisement at the bottom of the material information page
-      const addBigBottomAd = (page, adText) => {
-        page.drawRectangle({
-          x: 20,
-          y: 80,
-          width: 800,
+  
+      // Function to add the first-page ad
+      const addFirstPageAd = (adText) => {
+        currentPage.drawRectangle({
+          x: 50,
+          y: 50,
+          width: 500,
           height: 200,
           borderColor: rgb(0, 0.6, 0), // Green color
           borderWidth: 2,
         });
-        page.drawText(adText, {
-          x: 100,
-          y: 140,
-          size: 12,
-          color: rgb(0, 0, 0),
-          maxWidth: 480,
-        });
-      };
-
-      addBigBottomAd(currentPage, advertisementData[0] ? advertisementData[0].advertise : "Put your ads here");
-
-      // Remaining pages: Steps
-      if (product.pdfDetails[0].steps && product.pdfDetails[0].steps.length > 0) {
-        for (let i = 0; i < product.pdfDetails[0].steps.length; i++) {
-          const step = product.pdfDetails[0].steps[i];
-          currentPage = await addPageWithTemplate();
-          yPosition = 700;
-          addText(`Step ${i + 1}: ${step.text}`, 570, 500, 10 );
-          yPosition -= 40;
-          if (step.image) {
-            await addImage(step.image, 50, 180, 500, 380);
-            yPosition -= 320;
-          }
-        }
-      }
-
-      const addRightSideAd = (page, adText) => {
-        page.drawRectangle({
-          x: 560,
-          y: 180,
-          width: 250,
-          height: 400,
-          borderColor: rgb(0, 0.6, 0), // Green color
-          borderWidth: 2,
-        });
-        page.drawText(adText, {
-          x: 570,
-          y: 240,
-          size: 12,
-          color: rgb(0, 0, 0),
-          maxWidth: 200,
-        });
-      };
-
-      const addBottomAd = (page, adText) => {
-        page.drawRectangle({
-          x: 50,
-          y: 70,
-          width: 600,
-          height: 100,
-          borderColor: rgb(0, 0.6, 0), // Green color
-          borderWidth: 2,
-        });
-        page.drawText(adText, {
+        currentPage.drawText(adText, {
           x: 100,
           y: 120,
           size: 12,
@@ -218,66 +130,81 @@ function ProductCard() {
           maxWidth: 480,
         });
       };
-
-      // Add advertisements on each page except the first and the material information page
-      for (let i = 2; i < newPdfDoc.getPageCount(); i++) {
-        const page = newPdfDoc.getPage(i);
-        const adText = advertisementData[0] ? advertisementData[0].advertise : "Put your ads here";
-
-        addRightSideAd(page, adText);
-        addBottomAd(page, adText);
-
-        // Add footer with UNIT NAME
-        page.drawText(`${product.name}`, { x: 85, y: 30, size: 12 });
+  
+      // Adding the biggest ad (adType 1) on the first page
+      const firstPageAd = advertisementData.find(ad => ad.adType === 1);
+      if (firstPageAd) {
+        addFirstPageAd(firstPageAd.advertise);
       }
-
-      // Add the last page: Vendor and Labor Directory
+  
+      // Add product image and details on the first page
+      if (product && product.productImages && product.productImages.length > 0) {
+        await addImage(product.productImages[0], 50, 100, 700, 600);
+      }
+      addText(`${product.name}`, 85, 30, 12);
+  
+      // Second page: Material information
       currentPage = await addPageWithTemplate();
-      yPosition = 700;
-      addText("VENDOR AND LABOR DIRECTORY", 200, yPosition, 20);
-      yPosition -= 40;
-
-      const vendorList = [
-        "PLYWOOD & HARDWARE", "HOME DECOR", "FURNISHING", "WALLPAPER", "PAINTS & HARDWARE",
-        "FALSE CEILING", "SANITARY FIXTURES", "GRANITE & STONE", "LIGHTS", "ELECTRICAL & HARDWARE",
-        "GLASS & MIRROR"
-      ];
-
-      const laborList = [
-        "CARPENTER", "ELECTRICIAN", "GRANITE & TILES LABOR", "FALSE CEILING LABOR", "CORE CUTTING LABOR",
-        "PLUMBER", "HELPERS/ LIFTERS", "FOAM WORKER", "CLEANERS", "SAFE/ MOSQUITO NETS"
-      ];
-
-      tableStartX = 50;
-      tableStartY = yPosition;
-      tableWidth = 700;
-      rowHeight = 20;
-
-      // Draw combined table borders
+      let yPosition = 550;
+      addText("Material Information", 350, yPosition, 20);
+      yPosition -= 30;
+  
+      const materialInfo = product.pdfDetails[0].materialInfo;
+      let tableStartX = 20;
+      let tableStartY = yPosition;
+      let tableWidth = 800;
+      let rowHeight = 15;
+      let tableHeight = rowHeight * Object.keys(materialInfo).length;
+  
       currentPage.drawRectangle({
         x: tableStartX,
-        y: 200,
+        y: tableStartY - tableHeight - 10,
         width: tableWidth,
-        height: rowHeight * (Math.max(vendorList.length, laborList.length) + 2),
-        borderColor: rgb(0, 0.6, 0), // Green color
+        height: tableHeight + rowHeight,
+        borderColor: rgb(0, 0.6, 0),
         borderWidth: 2,
       });
-
-      // Add table headers
-      addText("VENDOR LIST", tableStartX + 5, 180 + rowHeight * (Math.max(vendorList.length, laborList.length) + 2), 16);
-      addText("LABOR LIST", tableStartX + tableWidth / 2 + 15, 180 + rowHeight * (Math.max(vendorList.length, laborList.length) + 2), 16);
-
-      // Add footer with UNIT NAME on the first page
-      addText(`${product.name}`, 85, 30, 12);
-      // Add table rows
-      vendorList.forEach((item, index) => {
-        addText(item, tableStartX + 5, 440 - (index + 1) * rowHeight, 12);
+  
+      yPosition = tableStartY - rowHeight;
+  
+      Object.keys(materialInfo).forEach(key => {
+        addText(key.replace(/([A-Z])/g, ' $1').toUpperCase(), tableStartX + 5, yPosition);
+        addText(materialInfo[key].value ? materialInfo[key].value.toString() : '', tableStartX + tableWidth / 2 + 5, yPosition);
+        yPosition -= rowHeight;
       });
-
-      laborList.forEach((item, index) => {
-        addText(item, tableStartX + tableWidth / 2 + 15, 440 - (index + 1) * rowHeight, 12);
-      });
-
+  
+      // Adding ads on the second page
+      const secondPageAdBottom = advertisementData.find(ad => ad.adType === 2);
+      const secondPageAdRight = advertisementData.find(ad => ad.adType === 3);
+      if (secondPageAdBottom) {
+        addBottomAd(currentPage, secondPageAdBottom.advertise);
+      }
+      if (secondPageAdRight) {
+        addRightSideAd(currentPage, secondPageAdRight.advertise);
+      }
+  
+      // Remaining pages: Steps
+      if (product.pdfDetails[0].steps && product.pdfDetails[0].steps.length > 0) {
+        for (let i = 0; i < product.pdfDetails[0].steps.length; i++) {
+          const step = product.pdfDetails[0].steps[i];
+          currentPage = await addPageWithTemplate();
+          yPosition = 700;
+          addText(`Step ${i + 1}: ${step.text}`, 570, 500, 10);
+          yPosition -= 40;
+          if (step.image) {
+            await addImage(step.image, 50, 180, 500, 380);
+            yPosition -= 320;
+          }
+        }
+      }
+  
+      // Last page: Adding adType 4 on the right side
+      const lastPageAdRight = advertisementData.find(ad => ad.adType === 4);
+      if (lastPageAdRight) {
+        currentPage = await addPageWithTemplate();
+        addRightSideAd(currentPage, lastPageAdRight.advertise);
+      }
+  
       const pdfBytes = await newPdfDoc.save();
       const blob = new Blob([pdfBytes], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
@@ -294,6 +221,44 @@ function ProductCard() {
       setLoading(false);
     }
   };
+  
+  // Helper functions for adding right side and bottom ads
+  const addRightSideAd = (page, adText) => {
+    page.drawRectangle({
+      x: 560,
+      y: 180,
+      width: 250,
+      height: 400,
+      borderColor: rgb(0, 0.6, 0),
+      borderWidth: 2,
+    });
+    page.drawText(adText, {
+      x: 570,
+      y: 240,
+      size: 12,
+      color: rgb(0, 0, 0),
+      maxWidth: 200,
+    });
+  };
+  
+  const addBottomAd = (page, adText) => {
+    page.drawRectangle({
+      x: 50,
+      y: 70,
+      width: 600,
+      height: 100,
+      borderColor: rgb(0, 0.6, 0),
+      borderWidth: 2,
+    });
+    page.drawText(adText, {
+      x: 100,
+      y: 120,
+      size: 12,
+      color: rgb(0, 0, 0),
+      maxWidth: 480,
+    });
+  };
+  
 
 
   const transformDescriptionToBulletPoints = (description) => {

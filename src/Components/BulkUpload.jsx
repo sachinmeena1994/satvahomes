@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from 'uuid';
+import { getFirestore, collection, doc, setDoc,updateDoc,arrayUnion } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import { useProductCategory } from "../Context/Product-Category-Context";
 const BulkUpload = () => {
+  const {categories} = useProductCategory()
   const [csvData, setCsvData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [imageUploadsInProgress, setImageUploadsInProgress] = useState(false);
-
+  const [selectedCategory, setProductDetails] = useState();
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     Papa.parse(file, {
@@ -75,11 +77,12 @@ const BulkUpload = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     const db = getFirestore();
-
+  
     for (const product of csvData) {
       try {
+        // Extract material information from CSV data
         const materialInfo = {
           plywood18mm: product["18MM PLYWOOD"] || "",
           plywood12mm: product["12MM PLYWOOD"] || "",
@@ -97,14 +100,16 @@ const BulkUpload = () => {
           externalLaminate2: product["EXTERNAL LAMINATE 2"] || "",
           externalLaminate3: product["EXTERNAL LAMINATE 3"] || "",
         };
-
+  
+        // Prepare product data
         const productData = {
+          id: uuidv4(), // Generate a unique ID for the product
           name: product["UNIT NAME"],
           description: product["UNIT THEME"],
           productImages: product["@IMAGE COVER PAGE"]
             ? product["@IMAGE COVER PAGE"].split(";")
             : [],
-          category: "POOJA UNIT",
+          category: selectedCategory, // Replace hardcoded value with dynamic selectedCategory
           pdfDetails: [
             {
               size: product["UNIT SIZE"],
@@ -113,23 +118,29 @@ const BulkUpload = () => {
               steps: Array.from({ length: 7 }, (_, i) => ({
                 text: product[`STEP - ${i + 1}`] || "",
                 image: product[`@IMAGE STEP ${i + 1}`] || "",
-              })).filter((step) => step.text || step.image),
+              })).filter((step) => step.text || step.image), // Filter out empty steps
               materialInfo,
             },
           ],
+          productDisplay: false, // Ensure the display flag is added
         };
-
-        const categoryDocRef = doc(db, `products/POOJA UNIT`);
-        const subCollectionRef = collection(categoryDocRef, productData.category);
-        await setDoc(doc(subCollectionRef), productData);
+  
+        // Reference to the category document
+        const categoryDocRef = doc(db, `products/${selectedCategory}`);
+  
+        // Add product to the products array in the selected category document
+        await updateDoc(categoryDocRef, {
+          products: arrayUnion(productData), // Add the new product to the products array
+        });
       } catch (error) {
         console.error("Error uploading product:", error);
       }
     }
-
+  
     setLoading(false);
     alert("Products uploaded successfully!");
   };
+  
 
   const downloadTemplate = () => {
     const csvContent = `UNIT CODE,UNIT NAME,UNIT SIZE,UNIT THEME,@IMAGE COVER PAGE,STEP - 1,@IMAGE STEP 1,STEP - 2,@IMAGE STEP 2,STEP - 3,@IMAGE STEP 3,STEP - 4,@IMAGE STEP 4,STEP - 5,@IMAGE STEP 5,STEP - 6,@IMAGE STEP 6,STEP - 7,@IMAGE STEP 7,@IMAGE FINAL OUTPUT,18MM PLYWOOD,12MM PLYWOOD,8MM PLYWOOD,3MM DECOLAM,HINGES,CHANNELS,HANDLES,BEADING PATTI,LEGS,PROFILE DOOR SIZE,MIRROR SIZE,INNER LAMINATE,EXTERNAL LAMINATE 1,EXTERNAL LAMINATE 2,EXTERNAL LAMINATE 3\n`;
@@ -143,68 +154,89 @@ const BulkUpload = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">Bulk Upload Products</h2>
-
-      {/* CSV Upload Section */}
+    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg max-w-4xl">
+      <h2 className="text-3xl font-semibold mb-8 text-gray-800">Bulk Upload Products</h2>
+  
+      {/* Category Selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700">Upload CSV</label>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
-        />
-        <button
-          type="button"
-          onClick={downloadTemplate}
-          className="bg-gray-500 mt-3 mb-3 text-white px-4 py-2 rounded-lg shadow duration-300 hover:bg-[#174f41]"
-        >
-          Download CSV Template
-        </button>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Select a Category *</label>
+        <div className="shadow-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setProductDetails(e.target.value )}
+            className="block w-full p-2.5 bg-gray-50 text-gray-900 rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-
+  
+      {/* CSV Upload Section */}
+      <div className="mb-8">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Upload CSV *</label>
+        <div className="flex items-center space-x-4">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <button
+            type="button"
+            onClick={downloadTemplate}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Download Template
+          </button>
+        </div>
+      </div>
+  
       {/* CSV Data Table with Image Upload Option */}
       {csvData.length > 0 && (
-        <div className="overflow-x-auto mb-6">
-          <table className="min-w-full bg-white border-collapse border">
-            <thead className="bg-gray-100">
+        <div className="overflow-x-auto mb-6 border rounded-lg shadow-sm">
+          <table className="min-w-full bg-white">
+            <thead className="bg-gray-200">
               <tr>
-                <th className="py-3 px-6 border text-left text-sm text-gray-700">Upload Images</th>
+                <th className="py-3 px-6 text-left text-sm font-semibold text-gray-700">Upload Images</th>
                 {Object.keys(csvData[0]).map((key) => (
-                  <th key={key} className="py-3 px-4 border text-left text-sm text-gray-700">
+                  <th key={key} className="py-3 px-4 text-left text-sm font-semibold text-gray-700">
                     {key}
                   </th>
                 ))}
-                <th className="py-3 px-4 border text-left text-sm text-gray-700">Actions</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {csvData.map((row, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-6 border">
+                <tr key={index} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-2 px-6 border-t">
                     <input
                       type="file"
                       accept="image/*"
                       multiple
                       onChange={(e) => handleImageFilesChange(e, index)}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
+                      className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 bg-white"
                     />
                   </td>
                   {Object.keys(row).map((key) => (
-                    <td key={key} className="py-2 px-4 border">
+                    <td key={key} className="py-2 px-4 border-t">
                       <input
                         type="text"
                         value={row[key]}
                         onChange={(e) => handleInputChange(index, key, e.target.value)}
-                        className="w-full border-none focus:ring-0 text-sm text-gray-800"
+                        className="block w-full text-sm text-gray-800 border border-gray-200 rounded-lg p-2 bg-white focus:outline-none"
                       />
                     </td>
                   ))}
-                  <td className="py-2 px-4 border">
+                  <td className="py-2 px-4 border-t">
                     <button
                       onClick={() => handleRemoveRow(index)}
-                      className="bg-red-500 text-white px-4 py-1 rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
                     >
                       Remove Row
                     </button>
@@ -215,12 +247,12 @@ const BulkUpload = () => {
           </table>
         </div>
       )}
-
+  
       {/* Submit Button */}
       <form onSubmit={handleSubmit} className="space-y-6">
         <button
           type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="w-full bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all duration-200"
           disabled={loading || imageUploadsInProgress}
         >
           {loading ? "Uploading..." : "Upload Products"}
@@ -228,6 +260,7 @@ const BulkUpload = () => {
       </form>
     </div>
   );
+  
 };
 
 export default BulkUpload;

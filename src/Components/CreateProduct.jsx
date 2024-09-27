@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import {
   getFirestore,
   collection,
@@ -12,6 +13,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const CreateProduct = () => {
   const {categories} = useProductCategory()
+  const [selectedCategory, setSelectedCategory] = useState("")
   const [productDetails, setProductDetails] = useState({
     name: "",
     description: "",
@@ -140,11 +142,15 @@ const CreateProduct = () => {
     }
   
     // Add the product data into the array inside the category document
-    const categoryDocRef = doc(db, `products/${productDetails.category}`);
+  
+    
+    const categoryDocRef = doc(db, `products/${selectedCategory}`);
+    const productId = uuidv4(); 
   
     try {
       await updateDoc(categoryDocRef, {
         products: arrayUnion({
+          id:productId,
           ...productData,
           pdfDetails: pdfData,
           productDispaly:false
@@ -156,6 +162,16 @@ const CreateProduct = () => {
       setLoading(false);
       console.error("Error adding product: ", error);
       alert("Error adding product.");
+    }
+  };
+  
+
+  const handleRemoveStep = (size, stepIndex) => {
+    const newPdfDetails = [...pdfDetails];
+    const pdfDetail = newPdfDetails.find((detail) => detail.size === size);
+    if (pdfDetail) {
+      pdfDetail.steps.splice(stepIndex, 1); // Remove the step at the given index
+      setPdfDetails(newPdfDetails);
     }
   };
   
@@ -207,29 +223,31 @@ const CreateProduct = () => {
           />
         </div>
         <div>
-          <label className="block mb-2 text-sm font-medium text-zinc-700">
-            Category
-          </label>
-          <div className="pr-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none">
-            <select
-              value={productDetails.name}
-              onChange={(e) =>
-                setProductDetails({
-                  ...productDetails,
-                  category: e.target.value,
-                })
-              }
-              className="bg-gray-50 border-none text-gray-900 text-sm block w-full outline-none"
-            >
-              <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+  <label className="block mb-2 text-sm font-medium text-zinc-700">
+    Category
+  </label>
+  <div className="pr-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none">
+    <select
+      value={productDetails.category} 
+      onChange={(e) => {
+        setProductDetails({
+          ...productDetails,
+          category: e.target.value,  // Update the category in productDetails
+        });
+        setSelectedCategory(e.target.value);  // Also update selectedCategory
+      }}
+      className="bg-gray-50 border-none text-gray-900 text-sm block w-full outline-none"
+    >
+      <option value="">Select a category</option>
+      {categories.map((category) => (
+        <option key={category.id} value={category.id} id={category.id}>
+          {category.name}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
         <div className="">
           <button
@@ -290,7 +308,7 @@ const CreateProduct = () => {
                         </td>
                         <td className="border-t border-gray-300 px-4 py-3">
                           <input
-                            type="number"
+                            type="text"
                             value={
                               pdfDetails[0].materialInfo[material]?.value || ""
                             }
@@ -306,7 +324,7 @@ const CreateProduct = () => {
                         </td>
                         <td className="border-t border-gray-300 px-4 py-3">
                           <input
-                            type="number"
+                            type="text"
                             value={
                               pdfDetails[1].materialInfo[material]?.value || ""
                             }
@@ -322,7 +340,7 @@ const CreateProduct = () => {
                         </td>
                         <td className="border-t border-gray-300 px-4 py-3">
                           <input
-                            type="number"
+                            type="text"
                             value={
                               pdfDetails[2].materialInfo[material]?.value || ""
                             }
@@ -360,77 +378,42 @@ const CreateProduct = () => {
                       Add Step
                     </button>
                     {pdfDetail.steps.map((step, stepIndex) => (
-                      // <div
-                      //   key={stepIndex}
-                      //   className="border p-4 mt-4 rounded-lg bg-white shadow-sm"
-                      // >
-                      //   <div className="text-sm font-medium text-gray-700">
-                      //     Step {stepIndex + 1}
-                      //   </div>
-                      //   <input
-                      //     type="text"
-                      //     value={step.text}
-                      //     onChange={(e) =>
-                      //       handleStepChange(
-                      //         pdfDetail.size,
-                      //         stepIndex,
-                      //         "text",
-                      //         e.target.value
-                      //       )
-                      //     }
-                      //     placeholder="Enter step text"
-                      //     className="mt-2 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                      //   />
-                      //   <input
-                      //     type="file"
-                      //     accept="image/*"
-                      //     onChange={(e) =>
-                      //       handleStepChange(
-                      //         pdfDetail.size,
-                      //         stepIndex,
-                      //         "image",
-                      //         e.target.files[0]
-                      //       )
-                      //     }
-                      //     className="mt-2 block w-full text-sm text-gray-500"
-                      //   />
-                      // </div>
-                      <div
-                        key={stepIndex}
-                        className="border border-gray-300 p-6 mt-4 rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
-                      >
-                        <div className="text-sm font-medium text-gray-700 mb-2">
-                          Step {stepIndex + 1}
-                        </div>
-                        <input
-                          type="text"
-                          value={step.text}
-                          onChange={(e) =>
-                            handleStepChange(
-                              pdfDetail.size,
-                              stepIndex,
-                              "text",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Enter step text"
-                          className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none mb-4"
-                        />
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handleStepChange(
-                              pdfDetail.size,
-                              stepIndex,
-                              "image",
-                              e.target.files[0]
-                            )
-                          }
-                          className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55c7] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
-                        />
-                      </div>
-                    ))}
+  <div
+    key={stepIndex}
+    className="border border-gray-300 p-6 mt-4 rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
+  >
+    <div className="text-sm font-medium text-gray-700 mb-2">
+      Step {stepIndex + 1}
+    </div>
+    <input
+      type="text"
+      value={step.text}
+      onChange={(e) =>
+        handleStepChange(pdfDetail.size, stepIndex, "text", e.target.value)
+      }
+      placeholder="Enter step text"
+      className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none mb-4"
+    />
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) =>
+        handleStepChange(pdfDetail.size, stepIndex, "image", e.target.files[0])
+      }
+      className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55c7] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
+    />
+
+    {/* Remove Step button */}
+    <button
+      type="button"
+      onClick={() => handleRemoveStep(pdfDetail.size, stepIndex)}
+      className="mt-2 bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 duration-300"
+    >
+      Remove Step
+    </button>
+  </div>
+))}
+
                   </div>
                 </div>
               ))}
