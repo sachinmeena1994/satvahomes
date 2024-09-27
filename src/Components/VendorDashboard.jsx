@@ -26,11 +26,13 @@ const VendorDashboard = () => {
     name: "",
     advertise: "",
     location: { state: "", city: [] },
+    
   });
   const [newAd, setNewAd] = useState({
     name: "",
     advertise: "",
     location: { state: "", city: [] },
+    
   });
 
   useEffect(() => {
@@ -83,6 +85,7 @@ const VendorDashboard = () => {
       name: "",
       advertise: "",
       location: { state: "", city: [] },
+      
     });
 
     toast.success("Advertisement updated successfully");
@@ -94,6 +97,7 @@ const VendorDashboard = () => {
       name: ad.name,
       advertise: ad.advertise,
       location: ad.location,
+      
     });
     setSelectedAd(ad.id);
     setIsEditing(true);
@@ -134,6 +138,7 @@ const VendorDashboard = () => {
             name: "",
             advertise: "",
             location: { state: "", city: [] },
+            
           });
 
           toast.success("Advertisement added successfully");

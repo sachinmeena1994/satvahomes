@@ -20,6 +20,7 @@ const ManageVendors = () => {
           id: doc.id,
           ...doc.data(),
         }));
+        console.log(adsData);
         setAdvertisements(adsData);
       }
     };
@@ -51,10 +52,10 @@ const ManageVendors = () => {
           <thead>
             <tr className="bg-[#056E55] text-white text-left">
               <th>Name</th>
-              <th>Advertisement</th>
-              <th>Location</th>
-              <th>Downloads</th>
-              <th>Status</th>
+              <th className="px-4 py-3">Advertisement</th>
+              <th className="px-4 py-3">Location</th>
+              <th className="px-4 py-3">Downloads</th>
+              <th className="px-4 py-3">Status</th>
             </tr>
           </thead>
           <tbody>
