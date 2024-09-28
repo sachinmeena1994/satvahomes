@@ -61,6 +61,13 @@ const BulkUpload = () => {
     setCsvData(updatedData);
   };
 
+  // Remove a row from the table
+  const handleRemoveRow = (rowIndex) => {
+    const updatedData = [...csvData];
+    updatedData.splice(rowIndex, 1); // Remove the row at the given index
+    setCsvData(updatedData); // Update the state
+  };
+
   // Submit data to Firebase
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -124,22 +131,6 @@ const BulkUpload = () => {
 
   // Define columns for MaterialReactTable
   const columns = useMemo(() => {
-    const baseColumns = [
-      {
-        accessorKey: "@IMAGE COVER PAGE",
-        header: "Upload Images",
-        Cell: ({ row }) => (
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleImageFilesChange(e, row.index)}
-            className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 bg-white"
-          />
-        ),
-      },
-    ];
-
     const dynamicColumns = Object.keys(csvData[0] || {}).map((key) => ({
       accessorKey: key,
       header: key,
@@ -153,7 +144,21 @@ const BulkUpload = () => {
       ),
     }));
 
-    return [...baseColumns, ...dynamicColumns];
+    // Add the Remove button column as the last column
+    const removeColumn = {
+      accessorKey: "remove",
+      header: "Remove",
+      Cell: ({ row }) => (
+        <button
+          onClick={() => handleRemoveRow(row.index)}
+          className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600"
+        >
+          Remove
+        </button>
+      ),
+    };
+
+    return [...dynamicColumns, removeColumn]; // Ensure Remove column is last
   }, [csvData]);
 
   // Download sample CSV template
@@ -212,8 +217,8 @@ const BulkUpload = () => {
       </div>
 
       {/* Display Data Table */}
-      {csvData.length > 0 && (
-        <MaterialReactTable columns={columns} data={csvData} enableColumnResizing />
+      {filteredCsvData.length > 0 && (
+        <MaterialReactTable columns={columns} data={filteredCsvData} enableColumnResizing />
       )}
 
       {/* Submit Button */}
