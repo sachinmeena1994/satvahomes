@@ -103,8 +103,8 @@ const VendorDashboard = () => {
   const handlePayment = async () => {
     const options = {
       key: "rzp_live_L1Bw0era4Ek6O7",
-      key_secret: "T3XWsJxig5vOcFLyh3BIFCHf", // Enter the Key ID generated from the Razorpay Dashboard
-      amount: 1000 * 100, // Amount is in currency subunits. Default currency is INR. Hence, 1000 = 10 INR
+      key_secret: "T3XWsJxig5vOcFLyh3BIFCHf",
+      amount: 1000 * 100,
       currency: "INR",
       name: "Satva Home",
       description: "Advertisement Fee",
@@ -177,23 +177,51 @@ const VendorDashboard = () => {
 
   return (
     <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">
-        Vendor Dashboard
-      </h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-700">Vendor Dashboard</h2>
+      
+      {/* Display existing advertisements */}
       <div className="mb-6">
         {advertisements.map((ad) => (
           <div key={ad.id} className="mb-4 p-4 bg-gray-100 rounded-lg">
             <h3 className="text-lg font-semibold">{ad.name}</h3>
-            <p className="text-sm text-gray-600">{ad.advertise}</p>
+  
+            {/* Check if the ad is a URL or just text and render accordingly */}
+            {Array.isArray(ad.advertise) ? (
+              ad.advertise.map((adItem, index) => (
+                <div key={index}>
+                  {typeof adItem.advertise === "string" && adItem.advertise.startsWith("http") ? (
+                    <img
+                      src={adItem.advertise}
+                      alt={`Advertisement ${index + 1}`}
+                      className="w-full h-auto rounded mt-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-600">{adItem.advertise}</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              typeof ad.advertise === "string" && ad.advertise.startsWith("http") ? (
+                <img
+                  src={ad.advertise}
+                  alt={ad.name}
+                  className="w-full h-auto rounded mt-2"
+                />
+              ) : (
+                <p className="text-sm text-gray-600">{ad.advertise}</p>
+              )
+            )}
+  
+            {/* Location details */}
             <div className="mt-2">
               <h4 className="text-sm font-semibold">Locations:</h4>
-              <p className="text-sm text-gray-600">
-                State: {ad.location.state}
-              </p>
+              <p className="text-sm text-gray-600">State: {ad.location.state}</p>
               <p className="text-sm text-gray-600">
                 Cities: {ad.location.city.join(", ")}
               </p>
             </div>
+  
+            {/* Editing an advertisement */}
             {selectedAd === ad.id && isEditing && (
               <div className="mt-4">
                 <input
@@ -208,9 +236,7 @@ const VendorDashboard = () => {
                 <textarea
                   placeholder="Advertisement"
                   value={editAd.advertise}
-                  onChange={(e) =>
-                    setEditAd({ ...editAd, advertise: e.target.value })
-                  }
+                  onChange={(e) => setEditAd({ ...editAd, advertise: e.target.value })}
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 resize-none outline-none mb-4"
                 />
                 <div className="pr-2 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none mb-4">
@@ -232,7 +258,7 @@ const VendorDashboard = () => {
                     ))}
                   </select>
                 </div>
-
+  
                 <input
                   type="text"
                   placeholder="Cities (comma separated)"
@@ -248,6 +274,8 @@ const VendorDashboard = () => {
                 </button>
               </div>
             )}
+  
+            {/* Button to edit an advertisement */}
             {(!isEditing || selectedAd !== ad.id) && (
               <button
                 onClick={() => handleEditAd(ad)}
@@ -259,7 +287,7 @@ const VendorDashboard = () => {
           </div>
         ))}
       </div>
-
+  
       {/* Add New Advertisement */}
       {isAdding && (
         <div className="mt-8 p-6 bg-gray-100 rounded-lg">
@@ -296,7 +324,7 @@ const VendorDashboard = () => {
               ))}
             </select>
           </div>
-
+  
           <input
             type="text"
             placeholder="Cities (comma separated)"
@@ -312,6 +340,8 @@ const VendorDashboard = () => {
           </button>
         </div>
       )}
+  
+      {/* Button to toggle add new advertisement form */}
       {!isAdding && (
         <button
           onClick={() => {
@@ -331,6 +361,7 @@ const VendorDashboard = () => {
       )}
     </div>
   );
+  
 };
 
 export default VendorDashboard;
