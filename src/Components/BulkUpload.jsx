@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useProductCategory } from "../Context/Product-Category-Context";
-import {MaterialReactTable} from "material-react-table";
+import { MaterialReactTable } from "material-react-table";
 
 const BulkUpload = () => {
   const { categories } = useProductCategory();
@@ -156,6 +156,18 @@ const BulkUpload = () => {
     return [...baseColumns, ...dynamicColumns];
   }, [csvData]);
 
+  // Download sample CSV template
+  const downloadTemplate = () => {
+    const csvContent = `UNIT CODE,UNIT NAME,UNIT SIZE,UNIT THEME,@IMAGE COVER PAGE,STEP - 1,@IMAGE STEP 1,STEP - 2,@IMAGE STEP 2,STEP - 3,@IMAGE STEP 3,STEP - 4,@IMAGE STEP 4,STEP - 5,@IMAGE STEP 5,STEP - 6,@IMAGE STEP 6,STEP - 7,@IMAGE STEP 7,@IMAGE FINAL OUTPUT,18MM PLYWOOD,12MM PLYWOOD,8MM PLYWOOD,3MM DECOLAM,HINGES,CHANNELS,HANDLES,BEADING PATTI,LEGS,PROFILE DOOR SIZE,MIRROR SIZE,INNER LAMINATE,EXTERNAL LAMINATE 1,EXTERNAL LAMINATE 2,EXTERNAL LAMINATE 3\n`;
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg max-w-4xl">
       <h2 className="text-3xl font-semibold mb-8 text-gray-800">Bulk Upload Products</h2>
@@ -169,7 +181,7 @@ const BulkUpload = () => {
             onChange={(e) => setProductDetails(e.target.value)}
             className="block w-full p-2.5 bg-gray-50 text-gray-900 rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
-            <option value="-1">Select a category</option>
+            <option value="">Select a category</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -189,6 +201,13 @@ const BulkUpload = () => {
             onChange={handleFileChange}
             className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 bg-white"
           />
+          <button
+            type="button"
+            onClick={downloadTemplate}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Download Template
+          </button>
         </div>
       </div>
 
