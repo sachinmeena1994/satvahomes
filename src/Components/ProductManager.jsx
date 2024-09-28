@@ -1,5 +1,5 @@
   import React, { useState, useEffect } from 'react';
-  import { getFirestore, collection, getDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+  import { getFirestore, collection, getDoc, doc, updateDoc ,arrayRemove} from 'firebase/firestore';
   import { toast } from 'react-toastify';
   import { useProductCategory } from '../Context/Product-Category-Context';
   const ProductManager = () => {
@@ -39,18 +39,34 @@
         fetchProducts();
       }
     }, [selectedCategory,db]);
-    
+ 
     const handleDelete = async (productId) => {
       try {
-        await deleteDoc(doc(db, `products/${selectedCategory}/${selectedCategory}`, productId));
-        setProducts(products.filter(product => product.id !== productId));
-        toast.success('Product deleted successfully');
+        // Find the product to remove
+        const productToDelete = products.find(product => product.id === productId);
+    
+        if (productToDelete) {
+          // Remove the product from the 'products' array in Firestore
+          const categoryDocRef = doc(db, `products/${selectedCategory}`);
+          await updateDoc(categoryDocRef, {
+            products: arrayRemove(productToDelete)
+          });
+    
+          // Update the local state by filtering out the deleted product
+          setProducts(products.filter(product => product.id !== productId));
+    
+          toast.success('Product deleted successfully');
+        } else {
+          toast.error('Product not found');
+        }
+        
         setDeletingProduct(null);
       } catch (error) {
         console.error('Error deleting product: ', error);
         toast.error('Error deleting product');
       }
     };
+    
 
     const handleEdit = (product) => {
       setEditingProduct(product);
