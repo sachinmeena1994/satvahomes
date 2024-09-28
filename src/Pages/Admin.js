@@ -15,6 +15,7 @@ import CreateProduct from "../Components/CreateProduct";
 import ProductManager from "../Components/ProductManager";
 import BulkUpload from "../Components/BulkUpload";
 import CategoryManager from "../Components/admin/ProductCatgeory"; 
+import ManageVendors from "../Components/ManageVendors";
 import {
   FaUsers,
   FaPlusCircle,
@@ -158,7 +159,28 @@ function Admin() {
             >
               <FaBoxOpen className="text-lg" />
               <span>Manage Products</span>
-            </li>}
+            </li>
+            
+            
+            }
+
+
+{currentUser.userDetails?.role === "admin" &&
+            <li
+              className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
+                menuOption === "manageVendors"
+                  ? "bg-[#174f41]"
+                  : "hover:bg-[#174f4166]"
+              }`}
+              onClick={() => setMenuOption("manageVendors")}
+            >
+              <FaBoxOpen className="text-lg" />
+              <span>Manage Vendors</span>
+            </li>
+            
+            
+            }
+            
           {(currentUser.userDetails?.role === "admin" || currentUser.userDetails?.role === "designer") &&
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
@@ -266,6 +288,7 @@ function Admin() {
           {menuOption === "advertisement" && <VendorDashboard />}
           {menuOption === "createProduct" && <CreateProduct />}
           {menuOption === "manageProducts" && <ProductManager />}
+          {menuOption === "manageVendors" && <ManageVendors />}
           {menuOption === "bulkUpload" && <BulkUpload />}
         </div>
       </main>

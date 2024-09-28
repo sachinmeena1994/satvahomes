@@ -217,8 +217,8 @@ const BulkUpload = () => {
       </div>
 
       {/* Display Data Table */}
-      {filteredCsvData.length > 0 && (
-        <MaterialReactTable columns={columns} data={filteredCsvData} enableColumnResizing />
+      {csvData.length > 0 && (
+        <MaterialReactTable columns={columns} data={csvData} enableColumnResizing />
       )}
 
       {/* Submit Button */}

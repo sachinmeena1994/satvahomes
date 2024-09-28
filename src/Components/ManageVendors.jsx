@@ -65,14 +65,27 @@ const ManageVendors = () => {
                 <td>
                   {Array.isArray(ad.advertise) ? (
                     ad.advertise.map((item, idx) => (
-                      <p key={idx}>{item.advertise}</p>
+                      // <p key={idx}>{item.advertise}</p>
+                      <img src={item.advertise} alt="ImageUrl"  className="object-cover h-20 w-20 "/>
                     ))
                   ) : (
                     <p>{ad.advertise}</p> // If it's a string, render directly
                   )}
                 </td>
                 <td>State: {ad.location.state}, Cities: {ad.location.city.join(", ")}</td>
-                <td>{ad.downloads}</td>
+
+
+                <td>
+                  {Array.isArray(ad.advertise) ? (
+                    ad.advertise.map((item, idx) => (
+                      // <p key={idx}>{item.advertise}</p>
+                      <td>{item.downloads}</td>
+                    ))
+                  ) : (
+                    <p>{0}</p> // If it's a string, render directly
+                  )}
+                </td>
+                {/*  */}
                 <td>
                   <button
                     onClick={() => toggleAdStatus(ad)}
