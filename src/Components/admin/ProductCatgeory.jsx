@@ -57,17 +57,18 @@ function CategoryManager() {
                     placeholder="Enter new category name"
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value)}
-                    className="flex-grow p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="shadow-sm bg-gray-50 border h-12 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none"
                 />
                 <input
                     type="file"
                     accept="image/*"
                     onChange={handleLogoChange}
-                    className="flex-grow p-2 border border-gray-300 rounded shadow-sm"
+                    className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
                 />
                 <button
                     onClick={handleAddCategory}
-                    className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded transition-colors duration-150"
+                    className={`${!newCategory || !newCategoryLogo ? "bg-[#009B64]":"bg-[#056E55]"} text-white px-4 py-2 whitespace-nowrap rounded-lg shadow duration-300 hover:bg-[#174f41]`}
+                    disabled={!newCategory || !newCategoryLogo}
                 >
                     Add Category
                 </button>
@@ -82,7 +83,7 @@ function CategoryManager() {
                         </div>
                         <button
                             onClick={() => handleRemoveCategory(category.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-colors duration-150"
+                            className="bg-red-500 text-white px-3 py-2 whitespace-nowrap rounded-lg shadow duration-300"
                         >
                             Remove
                         </button>

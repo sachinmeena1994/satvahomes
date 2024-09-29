@@ -235,7 +235,7 @@ const VendorDashboard = () => {
 
 
   return (
-    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
+    <div className="container mx-auto mt-3 p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-gray-700">
         Vendor Dashboard
       </h2>

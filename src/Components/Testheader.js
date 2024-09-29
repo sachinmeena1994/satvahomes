@@ -19,15 +19,15 @@ const Testheader = () => {
     setIsOpen(!isOpen);
   };
 
-    const handleCategoryChange = (e) => {
-      const selectedValue = e.target.value;
-      setSelectedCategory(selectedValue);
-      
-      // Directly use selectedValue to navigate
-      if (selectedValue && selectedValue !== "-1") {
-        navigate(`/product-category/${selectedValue}`);
-      }
-    };
+  const handleCategoryChange = (e) => {
+    const selectedValue = e.target.value;
+    setSelectedCategory(selectedValue);
+
+    // Directly use selectedValue to navigate
+    if (selectedValue && selectedValue !== "-1") {
+      navigate(`/product-category/${selectedValue}`);
+    }
+  };
 
   const handleLogout = () => {
     auth.signOut().then(() => {
@@ -88,7 +88,7 @@ const Testheader = () => {
                 <Link
                   to="/admin"
                   className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
-                    location.pathname === "/admin"
+                    location.pathname === "/contact"
                       ? "text-[#056E55]"
                       : "text-black"
                   }`}
@@ -113,11 +113,11 @@ const Testheader = () => {
                   name="categories"
                   id="categories"
                   onChange={handleCategoryChange}
-                  value={selectedCategory}
+                  // value={selectedCategory}
                 >
                   <option
                     className="text-gray-700 text-xl font-semibold"
-                    value=""
+                    value="-1"
                   >
                     Categories
                   </option>
@@ -135,31 +135,6 @@ const Testheader = () => {
             </nav>
           </div>
         </aside>
-                <div className="flex justify-center max-w-full">
-                  <select
-                    className="w-[80%] bg-white text-3xl font-semibold text-black py-2 px-4 rounded-lg outline-none"
-                    name="categories"
-                    id="categories"
-                    onChange={handleCategoryChange}
-                    // value={selectedCategory}
-                  >
-                    <option className="text-gray-700 text-xl font-semibold" value="-1">
-                      Categories
-                    </option>
-                    {categories.map((category) => (
-                      <option
-                        className="text-gray-700 text-[18px]"
-                        key={category.id}
-                        value={category.id}
-                      >
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </nav>
-            </div>
-          </aside>
 
         <div
           className={`fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-20 transition-opacity duration-700 ${
@@ -213,7 +188,7 @@ const Testheader = () => {
               <RxPerson className="block hover:text-[#056E55] duration-200 md:hidden text-zinc-900 text-2xl" />
             </Link>
           )}
-          {user && (
+          {user != null && user != null && (
             <button onClick={handleLogout} className="">
               <BsPersonCircle className="block hover:text-[#056E55] text-zinc-700 duration-200 lg:hidden text-2xl" />
             </button>
@@ -238,7 +213,7 @@ const Testheader = () => {
                 onChange={handleCategoryChange}
                 value={selectedCategory}
               >
-                <option className="text-zinc-700" value="">
+                <option className="text-zinc-700" value="-1">
                   Select a Category
                 </option>
                 {categories.map((category) => (
@@ -253,33 +228,6 @@ const Testheader = () => {
               </select>
             </div>
           )}
-            </Link>}
-            {/* Category Dropdown */}
-            {user !=null && 
-         <div className="border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
-        <select
-          className="outline-none bg-transparent uppercase rounded font-bold text-sm p-3 mr-4"
-          name="categories"
-          id="categories"
-          onChange={handleCategoryChange}
-          value={selectedCategory}
-        >
-          <option className="text-zinc-700" value="-1">
-            Select a Category
-          </option>
-          {categories.map((category) => (
-            <option
-              className="text-zinc-700"
-              key={category.id}  // Assuming each category has a unique ID.
-              value={category.id}  // Set the option value to the category name.
-            >
-              {category.name}  
-            </option>
-          ))}
-        </select>
-      </div>
-      
-            }
 
           {/* Admin and Logout Buttons */}
           {user != null && (
@@ -287,7 +235,7 @@ const Testheader = () => {
               to="/admin"
               className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 lg:flex lg:gap-[2px] lg:items-center"
             >
-              <h1 className="text-md mb-[1px] font-semibold">{userDetails?.role.charAt(0).toUpperCase()+userDetails?.role.slice(1)}</h1>
+              <h1 className="text-md mb-[1px] font-semibold">Admin</h1>
             </Link>
           )}
           {user != null && (

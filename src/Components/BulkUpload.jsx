@@ -174,17 +174,17 @@ const BulkUpload = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg max-w-4xl">
+    <div className="container mt-3 p-6 bg-white shadow-lg rounded-lg max-w-4xl">
       <h2 className="text-3xl font-semibold mb-8 text-gray-800">Bulk Upload Products</h2>
 
       {/* Category Selection */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Select a Category *</label>
-        <div className="shadow-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+        <div className="shadow-sm border border-gray-300 pr-2 bg-gray-50 rounded-lg focus:ring-primary-500 focus:border-primary-500">
           <select
             value={selectedCategory}
             onChange={(e) => setProductDetails(e.target.value)}
-            className="block w-full p-2.5 bg-gray-50 text-gray-900 rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="block w-full p-2.5 bg-gray-50 text-gray-900 rounded-lg border-none focus:outline-none"
           >
             <option value="">Select a category</option>
             {categories.map((category) => (
@@ -204,12 +204,12 @@ const BulkUpload = () => {
             type="file"
             accept=".csv"
             onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 bg-white"
+            className="file:bg-transparent file:border-none shadow-sm bg-gray-50 border h-12 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 outline-none"
           />
           <button
             type="button"
             onClick={downloadTemplate}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            className="bg-[#009B64] text-white px-4 py-3 whitespace-nowrap rounded-lg shadow duration-300 hover:bg-[#174f41]"
           >
             Download Template
           </button>
@@ -225,7 +225,7 @@ const BulkUpload = () => {
       <div className="mt-6">
         <button
           type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="bg-[#009B64] text-white px-4 py-2 whitespace-nowrap rounded-lg shadow duration-300 hover:bg-[#174f41]"
           disabled={loading}
           onClick={handleSubmit}
         >
