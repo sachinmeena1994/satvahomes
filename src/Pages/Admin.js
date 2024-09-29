@@ -246,10 +246,10 @@ function Admin() {
                       <FaUserTag className="text-[#0E6D55] mr-2" />
                       <h4 className="text-md font-semibold">Role :</h4>
                       <div className="flex items-center">
-                        <div className="pl-2 pr-2 border border-gray-200 rounded-md cursor-pointer relative">
+                        <div className="pl-2 pr-2 flex justify-center items-center border border-gray-200 rounded-md cursor-pointer relative">
                           {updatedUserIndex === index ? (
                             <select
-                              className="border border-gray-300 rounded-lg p-1 focus:outline-none"
+                              className="border-none bg-transparent rounded-lg p-2 outline-none"
                               value={user.role}
                               onChange={(e) =>
                                 handleEditRole(index, e.target.value)
@@ -260,18 +260,18 @@ function Admin() {
                               <option value="vendor">Vendor</option>
                             </select>
                           ) : (
-                            <span className="cursor-pointer">
+                            <span className="cursor-pointer p-1">
                               {user.role}
                             </span>
                           )}
                           {updatedUserIndex === index ? (
                             <FaPen
-                              className="text-[#0E6D55] ml-2"
+                              className="text-[#0E6D55] ml-2 text-xs"
                               onClick={() => handleUpdateRole(index)}
                             />
                           ) : (
                             <FaPen
-                              className="text-[#0E6D55] ml-2"
+                              className="text-[#0E6D55] ml-2 text-xs"
                               onClick={() =>
                                 setUpdatedUserIndex(index)
                               }
