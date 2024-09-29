@@ -1,11 +1,14 @@
-import './App.css';
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './Components/Layout';
-import Loading from './Components/Loader';
+
 import { ProductCategoryProvider } from './Context/Product-Category-Context'; // Adjust the path as needed
 import { UserProvider } from './Context/Current-User-Context'; // Import UserProvider
 import ProtectedRoute from './Components/Protected-Route';
+
+
+import './App.css';
+import Layout from './Components/Layout';
+import Loading from './Components/Loader';
 
 // Lazy load components
 const Home = lazy(() => import('./Pages/Home'));

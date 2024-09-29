@@ -19,12 +19,15 @@ const Testheader = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleCategoryChange = (e) => {
-    const selectedCategory = e.target.value;
-    if (selectedCategory) {
-      navigate(`/product-category/${selectedCategory}`);
-    }
-  };
+    const handleCategoryChange = (e) => {
+      const selectedValue = e.target.value;
+      setSelectedCategory(selectedValue);
+      
+      // Directly use selectedValue to navigate
+      if (selectedValue && selectedValue !== "-1") {
+        navigate(`/product-category/${selectedValue}`);
+      }
+    };
 
   const handleLogout = () => {
     auth.signOut().then(() => {
@@ -132,6 +135,31 @@ const Testheader = () => {
             </nav>
           </div>
         </aside>
+                <div className="flex justify-center max-w-full">
+                  <select
+                    className="w-[80%] bg-white text-3xl font-semibold text-black py-2 px-4 rounded-lg outline-none"
+                    name="categories"
+                    id="categories"
+                    onChange={handleCategoryChange}
+                    // value={selectedCategory}
+                  >
+                    <option className="text-gray-700 text-xl font-semibold" value="-1">
+                      Categories
+                    </option>
+                    {categories.map((category) => (
+                      <option
+                        className="text-gray-700 text-[18px]"
+                        key={category.id}
+                        value={category.id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </nav>
+            </div>
+          </aside>
 
         <div
           className={`fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-20 transition-opacity duration-700 ${
@@ -225,6 +253,33 @@ const Testheader = () => {
               </select>
             </div>
           )}
+            </Link>}
+            {/* Category Dropdown */}
+            {user !=null && 
+         <div className="border hidden lg:flex text-zinc-200 bg-[#0e6d55] rounded-md text-sm justify-between items-center gap-3">
+        <select
+          className="outline-none bg-transparent uppercase rounded font-bold text-sm p-3 mr-4"
+          name="categories"
+          id="categories"
+          onChange={handleCategoryChange}
+          value={selectedCategory}
+        >
+          <option className="text-zinc-700" value="-1">
+            Select a Category
+          </option>
+          {categories.map((category) => (
+            <option
+              className="text-zinc-700"
+              key={category.id}  // Assuming each category has a unique ID.
+              value={category.id}  // Set the option value to the category name.
+            >
+              {category.name}  
+            </option>
+          ))}
+        </select>
+      </div>
+      
+            }
 
           {/* Admin and Logout Buttons */}
           {user != null && (

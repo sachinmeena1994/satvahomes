@@ -1,23 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Papa from "papaparse";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import { v4 as uuidv4 } from 'uuid';
+import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useProductCategory } from "../Context/Product-Category-Context";
+import { MaterialReactTable } from "material-react-table";
 
 const BulkUpload = () => {
+  const { categories } = useProductCategory();
   const [csvData, setCsvData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [imageUploadsInProgress, setImageUploadsInProgress] = useState(false);
+  const [selectedCategory, setProductDetails] = useState("");
 
+  // Handle CSV File Upload
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     Papa.parse(file, {
       header: true,
       complete: (results) => {
-        setCsvData(results.data);
+        setCsvData(results.data); // Store parsed CSV data
       },
     });
   };
 
+  // Handle image upload and update corresponding columns
   const handleImageFilesChange = async (e, rowIndex) => {
     setImageUploadsInProgress(true);
     const files = Array.from(e.target.files);
@@ -28,32 +35,18 @@ const BulkUpload = () => {
       const storageRef = ref(storage, `images/${Date.now()}-${file.name}`);
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
-      uploadedUrls.push({ name: file.name, url: downloadURL });
+      uploadedUrls.push(downloadURL); // Push the download URL to the list
     }
 
+    // Assign uploaded URLs to corresponding columns
     const updatedCsvData = [...csvData];
     const row = updatedCsvData[rowIndex];
 
-    uploadedUrls.forEach((uploadedImage) => {
-      const fileNameParts = uploadedImage.name.split(".");
-      const imageType = fileNameParts[1]; // Extract the image type (e.g., IMAGE STEP 1)
-
-      if (imageType === "IMAGE COVER PAGE") {
-        row["@IMAGE COVER PAGE"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 1") {
-        row["@IMAGE STEP 1"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 2") {
-        row["@IMAGE STEP 2"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 3") {
-        row["@IMAGE STEP 3"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 4") {
-        row["@IMAGE STEP 4"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 5") {
-        row["@IMAGE STEP 5"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 6") {
-        row["@IMAGE STEP 6"] = uploadedImage.url;
-      } else if (imageType === "IMAGE STEP 7") {
-        row["@IMAGE STEP 7"] = uploadedImage.url;
+    uploadedUrls.forEach((url, i) => {
+      if (i === 0) {
+        row["@IMAGE COVER PAGE"] = url; // Assign the first image to @IMAGE COVER PAGE
+      } else {
+        row[`@IMAGE STEP ${i}`] = url; // Assign remaining images to @IMAGE STEP X
       }
     });
 
@@ -61,17 +54,21 @@ const BulkUpload = () => {
     setImageUploadsInProgress(false); // Image upload completed
   };
 
-  const handleInputChange = (index, key, value) => {
+  // Handle table input changes
+  const handleInputChange = (rowIndex, key, value) => {
     const updatedData = [...csvData];
-    updatedData[index][key] = value;
+    updatedData[rowIndex][key] = value;
     setCsvData(updatedData);
   };
 
-  const handleRemoveRow = (index) => {
-    const updatedData = csvData.filter((_, rowIndex) => rowIndex !== index);
-    setCsvData(updatedData);
+  // Remove a row from the table
+  const handleRemoveRow = (rowIndex) => {
+    const updatedData = [...csvData];
+    updatedData.splice(rowIndex, 1); // Remove the row at the given index
+    setCsvData(updatedData); // Update the state
   };
 
+  // Submit data to Firebase
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -99,12 +96,11 @@ const BulkUpload = () => {
         };
 
         const productData = {
+          id: uuidv4(),
           name: product["UNIT NAME"],
           description: product["UNIT THEME"],
-          productImages: product["@IMAGE COVER PAGE"]
-            ? product["@IMAGE COVER PAGE"].split(";")
-            : [],
-          category: "POOJA UNIT",
+          productImages: product["@IMAGE COVER PAGE"] ? product["@IMAGE COVER PAGE"].split(";") : [],
+          category: selectedCategory,
           pdfDetails: [
             {
               size: product["UNIT SIZE"],
@@ -117,11 +113,13 @@ const BulkUpload = () => {
               materialInfo,
             },
           ],
+          productDisplay: false,
         };
 
-        const categoryDocRef = doc(db, `products/POOJA UNIT`);
-        const subCollectionRef = collection(categoryDocRef, productData.category);
-        await setDoc(doc(subCollectionRef), productData);
+        const categoryDocRef = doc(db, `products/${selectedCategory}`);
+        await updateDoc(categoryDocRef, {
+          products: arrayUnion(productData),
+        });
       } catch (error) {
         console.error("Error uploading product:", error);
       }
@@ -131,6 +129,39 @@ const BulkUpload = () => {
     alert("Products uploaded successfully!");
   };
 
+  // Define columns for MaterialReactTable
+  const columns = useMemo(() => {
+    const dynamicColumns = Object.keys(csvData[0] || {}).map((key) => ({
+      accessorKey: key,
+      header: key,
+      Cell: ({ row }) => (
+        <input
+          type="text"
+          value={row.original[key]}
+          onChange={(e) => handleInputChange(row.index, key, e.target.value)}
+          className="w-full border-none focus:ring-0 text-sm text-gray-800"
+        />
+      ),
+    }));
+
+    // Add the Remove button column as the last column
+    const removeColumn = {
+      accessorKey: "remove",
+      header: "Remove",
+      Cell: ({ row }) => (
+        <button
+          onClick={() => handleRemoveRow(row.index)}
+          className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600"
+        >
+          Remove
+        </button>
+      ),
+    };
+
+    return [...dynamicColumns, removeColumn]; // Ensure Remove column is last
+  }, [csvData]);
+
+  // Download sample CSV template
   const downloadTemplate = () => {
     const csvContent = `UNIT CODE,UNIT NAME,UNIT SIZE,UNIT THEME,@IMAGE COVER PAGE,STEP - 1,@IMAGE STEP 1,STEP - 2,@IMAGE STEP 2,STEP - 3,@IMAGE STEP 3,STEP - 4,@IMAGE STEP 4,STEP - 5,@IMAGE STEP 5,STEP - 6,@IMAGE STEP 6,STEP - 7,@IMAGE STEP 7,@IMAGE FINAL OUTPUT,18MM PLYWOOD,12MM PLYWOOD,8MM PLYWOOD,3MM DECOLAM,HINGES,CHANNELS,HANDLES,BEADING PATTI,LEGS,PROFILE DOOR SIZE,MIRROR SIZE,INNER LAMINATE,EXTERNAL LAMINATE 1,EXTERNAL LAMINATE 2,EXTERNAL LAMINATE 3\n`;
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -143,89 +174,64 @@ const BulkUpload = () => {
   };
 
   return (
-    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">Bulk Upload Products</h2>
+    <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg max-w-4xl">
+      <h2 className="text-3xl font-semibold mb-8 text-gray-800">Bulk Upload Products</h2>
 
-      {/* CSV Upload Section */}
+      {/* Category Selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700">Upload CSV</label>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
-        />
-        <button
-          type="button"
-          onClick={downloadTemplate}
-          className="bg-gray-500 mt-3 mb-3 text-white px-4 py-2 rounded-lg shadow duration-300 hover:bg-[#174f41]"
-        >
-          Download CSV Template
-        </button>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Select a Category *</label>
+        <div className="shadow-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setProductDetails(e.target.value)}
+            className="block w-full p-2.5 bg-gray-50 text-gray-900 rounded-lg border-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      {/* CSV Data Table with Image Upload Option */}
-      {csvData.length > 0 && (
-        <div className="overflow-x-auto mb-6">
-          <table className="min-w-full bg-white border-collapse border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="py-3 px-6 border text-left text-sm text-gray-700">Upload Images</th>
-                {Object.keys(csvData[0]).map((key) => (
-                  <th key={key} className="py-3 px-4 border text-left text-sm text-gray-700">
-                    {key}
-                  </th>
-                ))}
-                <th className="py-3 px-4 border text-left text-sm text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {csvData.map((row, index) => (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="py-2 px-6 border">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => handleImageFilesChange(e, index)}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#056e55d3] file:text-[white] file:duration-500 hover:file:bg-[#056E55]"
-                    />
-                  </td>
-                  {Object.keys(row).map((key) => (
-                    <td key={key} className="py-2 px-4 border">
-                      <input
-                        type="text"
-                        value={row[key]}
-                        onChange={(e) => handleInputChange(index, key, e.target.value)}
-                        className="w-full border-none focus:ring-0 text-sm text-gray-800"
-                      />
-                    </td>
-                  ))}
-                  <td className="py-2 px-4 border">
-                    <button
-                      onClick={() => handleRemoveRow(index)}
-                      className="bg-red-500 text-white px-4 py-1 rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-                    >
-                      Remove Row
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* CSV Upload Section */}
+      <div className="mb-8">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Upload CSV *</label>
+        <div className="flex items-center space-x-4">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-500 border border-gray-300 rounded-lg p-2 bg-white"
+          />
+          <button
+            type="button"
+            onClick={downloadTemplate}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          >
+            Download Template
+          </button>
         </div>
+      </div>
+
+      {/* Display Data Table */}
+      {csvData.length > 0 && (
+        <MaterialReactTable columns={columns} data={csvData} enableColumnResizing />
       )}
 
       {/* Submit Button */}
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="mt-6">
         <button
           type="submit"
           className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-          disabled={loading || imageUploadsInProgress}
+          disabled={loading}
+          onClick={handleSubmit}
         >
           {loading ? "Uploading..." : "Upload Products"}
         </button>
-      </form>
+      </div>
     </div>
   );
 };

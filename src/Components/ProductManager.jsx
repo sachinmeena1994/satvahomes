@@ -1,50 +1,72 @@
   import React, { useState, useEffect } from 'react';
-  import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+  import { getFirestore, collection, getDoc, doc, updateDoc ,arrayRemove} from 'firebase/firestore';
   import { toast } from 'react-toastify';
-
+  import { useProductCategory } from '../Context/Product-Category-Context';
   const ProductManager = () => {
-    const [categories, setCategories] = useState([]);
+    const { categories, loading } = useProductCategory();
+    // const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [products, setProducts] = useState([]);
     const [editingProduct, setEditingProduct] = useState(null);
     const [deletingProduct, setDeletingProduct] = useState(null);
     const db = getFirestore();
 
-    useEffect(() => {
-      const fetchCategories = async () => {
-        const categoriesCollection = collection(db, "products");
-        const categoriesSnapshot = await getDocs(categoriesCollection);
-        const categoriesData = categoriesSnapshot.docs.map((doc) => doc.id);
-        setCategories(categoriesData);
-      };
-
-      fetchCategories();
-    }, [db]);
+  
 
     useEffect(() => {
       if (selectedCategory) {
         const fetchProducts = async () => {
-          const productsCollection = collection(db, `products/${selectedCategory}/${selectedCategory}`);
-          const productsSnapshot = await getDocs(productsCollection);
-          const productsData = productsSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setProducts(productsData);
+          try {
+            const productDocRef = doc(db, `products`, selectedCategory); // Reference to the document
+            const productSnapshot = await getDoc(productDocRef);
+    
+            if (productSnapshot.exists()) {
+              // If the document exists, get its data
+              const productData = { id: productSnapshot.id, ...productSnapshot.data() };
+              if(productData.products){
+                setProducts(productData.products);
+              }
+   
+            } else {
+              console.log("No such document!");
+              setProducts([]); // Clear products if no document found
+            }
+          } catch (error) {
+            console.error("Error fetching document:", error);
+          }
         };
-
+    
         fetchProducts();
       }
-    }, [selectedCategory, db]);
-
+    }, [selectedCategory,db]);
+ 
     const handleDelete = async (productId) => {
       try {
-        await deleteDoc(doc(db, `products/${selectedCategory}/${selectedCategory}`, productId));
-        setProducts(products.filter(product => product.id !== productId));
-        toast.success('Product deleted successfully');
+        // Find the product to remove
+        const productToDelete = products.find(product => product.id === productId);
+    
+        if (productToDelete) {
+          // Remove the product from the 'products' array in Firestore
+          const categoryDocRef = doc(db, `products/${selectedCategory}`);
+          await updateDoc(categoryDocRef, {
+            products: arrayRemove(productToDelete)
+          });
+    
+          // Update the local state by filtering out the deleted product
+          setProducts(products.filter(product => product.id !== productId));
+    
+          toast.success('Product deleted successfully');
+        } else {
+          toast.error('Product not found');
+        }
+        
         setDeletingProduct(null);
       } catch (error) {
         console.error('Error deleting product: ', error);
         toast.error('Error deleting product');
       }
     };
+    
 
     const handleEdit = (product) => {
       setEditingProduct(product);
@@ -80,11 +102,16 @@
           <select 
             className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" 
             value={selectedCategory} 
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              const selectedIndex =e.target.value;
+                
+                setSelectedCategory(selectedIndex)
+              }
+            }
           >
             <option value="">Select a category</option>
             {categories.map((category) => (
-              <option key={category.nam} value={category.name}>{category.name}</option>
+              <option key={category.id} value={category.id} id>{category.name}</option>
             ))}
           </select>
         </div>

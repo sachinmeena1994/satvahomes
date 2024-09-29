@@ -467,9 +467,7 @@ const VendorDashboard = () => {
             {/* Location details */}
             <div className="mt-2">
               <h4 className="text-sm font-semibold">Locations:</h4>
-              <p className="text-sm text-gray-600">
-                State: {ad.location.state}
-              </p>
+              <p className="text-sm text-gray-600">State: {ad.location.state}</p>
               <p className="text-sm text-gray-600">
                 Cities: {ad.location.city.join(", ")}
               </p>
@@ -490,6 +488,7 @@ const VendorDashboard = () => {
                 {/* <textarea
                   placeholder="Advertisement"
                   value={editAd.advertise}
+                  onChange={(e) => setEditAd({ ...editAd, advertise: e.target.value })}
                   onChange={(e) => setEditAd({ ...editAd, advertise: e.target.value })}
                   className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 resize-none outline-none mb-4"
                 /> */}
@@ -512,7 +511,7 @@ const VendorDashboard = () => {
                     ))}
                   </select>
                 </div>
-
+  
                 <input
                   type="text"
                   placeholder="Cities (comma separated)"
@@ -543,6 +542,7 @@ const VendorDashboard = () => {
       </div>
     </div>
   );
+  
 };
 
 export default VendorDashboard;
