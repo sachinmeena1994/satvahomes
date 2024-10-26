@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from "react";
 import Papa from "papaparse";
-import { v4 as uuidv4 } from 'uuid';
-import { getFirestore, doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { v4 as uuidv4 } from "uuid";
+import { getFirestore, doc, writeBatch, arrayUnion } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import imageCompression from "browser-image-compression";
 import { useProductCategory } from "../Context/Product-Category-Context";
 import { MaterialReactTable } from "material-react-table";
 
@@ -11,7 +12,8 @@ const BulkUpload = () => {
   const [csvData, setCsvData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [imageUploadsInProgress, setImageUploadsInProgress] = useState(false);
-  const [selectedCategory, setProductDetails] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [bulkDescription, setBulkDescription] = useState(""); // State for bulk description
 
   // Handle CSV File Upload
   const handleFileChange = (e) => {
@@ -24,34 +26,48 @@ const BulkUpload = () => {
     });
   };
 
-  // Handle image upload and update corresponding columns
+  // Handle image upload with compression and update corresponding columns
   const handleImageFilesChange = async (e, rowIndex) => {
     setImageUploadsInProgress(true);
     const files = Array.from(e.target.files);
     const storage = getStorage();
-    const uploadedUrls = [];
 
-    for (const file of files) {
+    // Compress images before upload
+    const compressedFiles = await Promise.all(
+      files.map((file) =>
+        imageCompression(file, { maxSizeMB: 1, maxWidthOrHeight: 1024 })
+      )
+    );
+
+    // Use Promise.all to upload all images concurrently
+    const uploadPromises = compressedFiles.map((file) => {
       const storageRef = ref(storage, `images/${Date.now()}-${file.name}`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      uploadedUrls.push(downloadURL); // Push the download URL to the list
-    }
-
-    // Assign uploaded URLs to corresponding columns
-    const updatedCsvData = [...csvData];
-    const row = updatedCsvData[rowIndex];
-
-    uploadedUrls.forEach((url, i) => {
-      if (i === 0) {
-        row["@IMAGE COVER PAGE"] = url; // Assign the first image to @IMAGE COVER PAGE
-      } else {
-        row[`@IMAGE STEP ${i}`] = url; // Assign remaining images to @IMAGE STEP X
-      }
+      return uploadBytes(storageRef, file).then((snapshot) =>
+        getDownloadURL(snapshot.ref)
+      );
     });
 
-    setCsvData(updatedCsvData);
-    setImageUploadsInProgress(false); // Image upload completed
+    try {
+      const uploadedUrls = await Promise.all(uploadPromises);
+
+      // Assign uploaded URLs to corresponding columns
+      const updatedCsvData = [...csvData];
+      const row = updatedCsvData[rowIndex];
+
+      uploadedUrls.forEach((url, i) => {
+        if (i === 0) {
+          row["@IMAGE COVER PAGE"] = url; // Assign the first image to @IMAGE COVER PAGE
+        } else {
+          row[`@IMAGE STEP ${i}`] = url; // Assign remaining images to @IMAGE STEP X
+        }
+      });
+
+      setCsvData(updatedCsvData);
+    } catch (error) {
+      console.error("Error uploading images:", error);
+    } finally {
+      setImageUploadsInProgress(false); // Image upload completed
+    }
   };
 
   // Handle table input changes
@@ -68,12 +84,13 @@ const BulkUpload = () => {
     setCsvData(updatedData); // Update the state
   };
 
-  // Submit data to Firebase
+  // Submit data to Firebase using batch writes
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const db = getFirestore();
+    const batch = writeBatch(db); // Initialize Firestore batch
 
     for (const product of csvData) {
       try {
@@ -98,8 +115,10 @@ const BulkUpload = () => {
         const productData = {
           id: uuidv4(),
           name: product["UNIT NAME"],
-          description: product["UNIT THEME"],
-          productImages: product["@IMAGE COVER PAGE"] ? product["@IMAGE COVER PAGE"].split(";") : [],
+          description: bulkDescription || product["UNIT THEME"], // Use bulkDescription or product-specific theme
+          productImages: product["@IMAGE COVER PAGE"]
+            ? product["@IMAGE COVER PAGE"].split(";")
+            : [],
           category: selectedCategory,
           pdfDetails: [
             {
@@ -117,16 +136,22 @@ const BulkUpload = () => {
         };
 
         const categoryDocRef = doc(db, `products/${selectedCategory}`);
-        await updateDoc(categoryDocRef, {
+        batch.update(categoryDocRef, {
           products: arrayUnion(productData),
         });
       } catch (error) {
-        console.error("Error uploading product:", error);
+        console.error("Error preparing product for upload:", error);
       }
     }
 
-    setLoading(false);
-    alert("Products uploaded successfully!");
+    try {
+      await batch.commit(); // Commit the batch
+      alert("Products uploaded successfully!");
+    } catch (error) {
+      console.error("Error uploading products:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Define columns for MaterialReactTable
@@ -144,6 +169,21 @@ const BulkUpload = () => {
       ),
     }));
 
+    // Add the image upload column as the first column
+    const imageUploadColumn = {
+      accessorKey: "imageUpload",
+      header: "Upload Image",
+      Cell: ({ row }) => (
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={(e) => handleImageFilesChange(e, row.index)}
+          className="w-full border-none focus:ring-0 text-sm text-gray-800"
+        />
+      ),
+    };
+
     // Add the Remove button column as the last column
     const removeColumn = {
       accessorKey: "remove",
@@ -158,7 +198,7 @@ const BulkUpload = () => {
       ),
     };
 
-    return [...dynamicColumns, removeColumn]; // Ensure Remove column is last
+    return [imageUploadColumn, ...dynamicColumns, removeColumn]; // Ensure imageUpload is first and Remove column is last
   }, [csvData]);
 
   // Download sample CSV template
@@ -179,11 +219,13 @@ const BulkUpload = () => {
 
       {/* Category Selection */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Select a Category *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Select a Category *
+        </label>
         <div className="shadow-sm border border-gray-300 pr-2 bg-gray-50 rounded-lg focus:ring-primary-500 focus:border-primary-500">
           <select
             value={selectedCategory}
-            onChange={(e) => setProductDetails(e.target.value)}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             className="block w-full p-2.5 bg-gray-50 text-gray-900 rounded-lg border-none focus:outline-none"
           >
             <option value="">Select a category</option>
@@ -196,9 +238,24 @@ const BulkUpload = () => {
         </div>
       </div>
 
+      {/* Bulk Description Input */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Bulk Description
+        </label>
+        <textarea
+          placeholder="Enter a description that applies to all products"
+          value={bulkDescription}
+          onChange={(e) => setBulkDescription(e.target.value)}
+          className="block w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg"
+        />
+      </div>
+
       {/* CSV Upload Section */}
       <div className="mb-8">
-        <label className="block text-sm font-medium text-gray-700 mb-2">Upload CSV *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Upload CSV *
+        </label>
         <div className="flex items-center space-x-4">
           <input
             type="file"

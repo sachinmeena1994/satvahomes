@@ -231,12 +231,22 @@ const Testheader = () => {
 
           {/* Admin and Logout Buttons */}
           {user != null && (
+       <>
             <Link
               to="/admin"
               className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 lg:flex lg:gap-[2px] lg:items-center"
             >
               <h1 className="text-md mb-[1px] font-semibold">Admin</h1>
             </Link>
+            
+            <Link
+              to="/vendor"
+              className="hidden hover:text-zinc-100 hover:bg-[#056E55] bg-zinc-200 px-3 py-[10px] rounded-md text-[#056E55] duration-200 lg:flex lg:gap-[2px] lg:items-center"
+            >
+              <h1 className="text-md mb-[1px] font-semibold">Vendor</h1>
+            </Link>
+            </>
+            
           )}
           {user != null && (
             <button

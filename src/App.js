@@ -19,6 +19,7 @@ const Admin = lazy(() => import('./Pages/Admin'));
 const FAQ = lazy(() => import('./Pages/FAQ'));
 const About = lazy(() => import('./Pages/About'));
 const Contact = lazy(() => import('./Pages/Contact'));
+const Vendor = lazy(() => import('./Pages/Vendor'));
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/vendor" element={<Vendor />} />
                 <Route path="/product-category/:category" element={<ProductList />} />
                 <Route path="/product/:category/:productId" element={<ProductCard />} />
                 <Route
