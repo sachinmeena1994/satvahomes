@@ -2,8 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getFirestore, doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { updateDoc, arrayUnion } from "firebase/firestore"; // Ensure you import updateDoc from Firebase Firestore
+import { toast } from "react-toastify";
+import { useUser } from "../Context/Current-User-Context";
 
 function ProductCard() {
+const {userDetails}=useUser();
+console.log(userDetails)
   const { category, productId } = useParams();
   const [product, setProduct] = useState(null);
   const [advertisementData, setAdvertisementData] = useState([]);
@@ -18,7 +23,65 @@ function ProductCard() {
     return description.split('.').filter(point => point.trim().length > 0);
   };
 
-  // Fetch product and advertisement data
+
+  const updateCityDownloadCounts = (ad, userCity) => {
+    const updatedDownloads = { ...ad.downloads }; // Copy existing download counts
+    
+    // Increase download count for the user's city only
+    if (userCity in updatedDownloads) {
+      updatedDownloads[userCity] += Math.floor(Math.random() * 3 + 3); // Random increment between 3 and 5
+    } else {
+      updatedDownloads[userCity] = Math.floor(Math.random() * 3 + 3); // Initialize if not present
+    }
+    
+    return updatedDownloads;
+  };
+
+  const fetchAdvertisementData = async () => {
+    try {
+      const db = getFirestore();
+      const advertisementCollection = collection(db, "advertisement");
+      const advertisementSnapshot = await getDocs(advertisementCollection);
+  
+      // User's city and state details
+      const userCity = userDetails?.location.city;
+      const userState = userDetails?.location.state;
+      console.log("User City:", userCity, "User State:", userState);
+  
+      // Filtering advertisements where any ad's location matches user's location
+      const filteredAdvertisements = advertisementSnapshot.docs
+        .map((doc) => {
+          const data = { id: doc.id, ...doc.data() };
+          console.log("Full Advertisement Document:", data); // Log full document
+  
+          // Check if any ad within `advertisements` array matches user location
+          const matchedAds = data.advertisements?.filter((ad) => {
+            const isStateMatch = ad.location?.state === userState;
+            const isCityMatch = ad.location?.city.includes(userCity);
+  
+            // Log matching status for debugging
+            console.log(
+              `Checking ad ${ad.id}: State Match - ${isStateMatch}, City Match - ${isCityMatch}`
+            );
+  
+            return isStateMatch && isCityMatch;
+          });
+  
+          // Return the document if there are any matching ads
+          return matchedAds && matchedAds.length > 0 ? { ...data, advertisements: matchedAds } : null;
+        })
+        .filter((data) => data !== null); // Filter out non-matching documents
+  
+      console.log("Filtered Advertisements:", filteredAdvertisements); // Final filtered result
+  
+      setAdvertisementData(filteredAdvertisements);
+    } catch (error) {
+      console.error("Error fetching advertisement data:", error);
+    }
+  };
+  
+  
+  
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -47,23 +110,19 @@ function ProductCard() {
       }
     };
   
-    const fetchAdvertisementData = async () => {
-      try {
-        const db = getFirestore();
-        const advertisementCollection = collection(db, "advertisement");
-        const advertisementSnapshot = await getDocs(advertisementCollection);
-        const advertisementDataArray = advertisementSnapshot.docs.map(doc => doc.data());
-        setAdvertisementData(advertisementDataArray);
-      } catch (error) {
-        console.error("Error fetching advertisement data:", error);
-      }
-    };
+   
+    
   
+   
     if (category && productId) {
       fetchProduct();
-      fetchAdvertisementData();
+     
     }
   }, [category, productId]);
+
+  useEffect(()=>{
+    fetchAdvertisementData();
+  },[userDetails])
   const handleDownloadPDF = async () => {
     try {
       setLoading(true);
@@ -165,27 +224,25 @@ function ProductCard() {
   
       const displayedAds = new Set();  // To keep track of displayed ads
 
+      const displayedAdsMap = {}; // Track displayed ads by adType
+
       const addAdByType = async ({ adType, x, y, width, height, showContactMessage = false }) => {
         let adFound = false;
       
-        // Only search for an ad if we are not supposed to show the contact message
         if (!showContactMessage) {
-          console.log(`Searching for adType ${adType}...`);  // Debugging message
           for (const adData of advertisementData) {
-            const activeAd = adData.advertise.find((a) => a.adType === adType && a.isActive && !displayedAds.has(a.advertise));
+            const activeAd = adData.advertisements.find(a => parseInt(a.adType) === adType && a.isActive && !displayedAds.has(a.advertise));
             if (activeAd) {
-              console.log(`Ad found for adType ${adType}:`, activeAd);  // Debugging message
               await addImage({ imageUrl: activeAd.advertise, x, y, width, height });
               adFound = true;
-              displayedAds.add(activeAd.advertise);  // Mark this ad as displayed
-              break;  // Stop searching after finding the first matching ad
+              displayedAds.add(activeAd.advertise); // Mark this ad as displayed
+              displayedAdsMap[adType] = { adId: adData.id, adIndex: adData.advertisements.indexOf(activeAd) }; // Track ad details for later
+              break;
             }
           }
         }
       
-        // If no ad was found or if showContactMessage is true, show the contact message
         if (!adFound || showContactMessage) {
-          console.log(`No ad found or showing contact message for adType ${adType}`);  // Debugging message
           currentPage.drawText("Contact us for ADS", { x: x + 10, y: y + 50, size: 12, color: rgb(1, 0, 0) });
           currentPage.drawRectangle({
             x,
@@ -197,7 +254,7 @@ function ProductCard() {
           });
         }
       };
-      ;
+      
       
   
       // Add product image on the first page (cover page)
@@ -329,6 +386,31 @@ for (let i = 0; i < product?.pdfDetails?.[0]?.steps?.length; i++) {
     
       setProgress(100); // Completed progress
       setLoading(false); // Done
+    // Update the download counts for each displayed ad
+   // Updating download counts in Firestore
+const fireDB = getFirestore();
+
+for (const adType in displayedAdsMap) {
+  const { adId, adIndex } = displayedAdsMap[adType];
+  const adRef = doc(fireDB, "advertisement", adId);
+
+  const adData = advertisementData.find(ad => ad.id === adId);
+  if (adData && adData.advertisements[adIndex]) {
+    // Update the city download counts for the specific user's city
+    const userCity = userDetails.location.city; // User’s current city from their profile
+    const updatedDownloads = updateCityDownloadCounts(adData.advertisements[adIndex], userCity);
+
+    const updatedAdvertisements = adData.advertisements.map((ad, index) =>
+      index === adIndex ? { ...ad, downloads: updatedDownloads } : ad
+    );
+
+    // Save updated advertisements array back to Firestore
+    await updateDoc(adRef, { advertisements: updatedAdvertisements });
+  }
+}
+
+    toast.success("Download counts updated for the cities in the advertisements!");
+  
     } catch (error) {
       console.error("Error creating PDF:", error);
       setLoading(false);
