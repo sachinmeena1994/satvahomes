@@ -12,10 +12,12 @@ import {
 import { toast } from "react-toastify";
 import { fireDB, auth } from "../firebase-config";
 import { districts } from "../state";
+import { useProductCategory } from "../Context/Product-Category-Context";
 
 const VendorDashboard = () => {
   const [advertisements, setAdvertisements] = useState([]);
-
+  const {categories} =useProductCategory()
+  console.log(categories)
   const [newCity, setNewCity] = useState("");
   const [newState, setNewState] = useState("");
   const [cities, setCities] = useState([]);

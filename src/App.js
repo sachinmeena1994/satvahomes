@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+import { HashRouter } from 'react-router-dom';
 import { ProductCategoryProvider } from './Context/Product-Category-Context'; // Adjust the path as needed
 import { UserProvider } from './Context/Current-User-Context'; // Import UserProvider
 import ProtectedRoute from './Components/Protected-Route';
@@ -25,7 +25,7 @@ function App() {
   return (
     <UserProvider>
       <ProductCategoryProvider>
-        <Router>
+        <HashRouter>
           <Layout>
             <Suspense fallback={<Loading />}>
               <Routes>
@@ -48,7 +48,7 @@ function App() {
               </Routes>
             </Suspense>
           </Layout>
-        </Router>
+        </HashRouter>
       </ProductCategoryProvider>
     </UserProvider>
   );
