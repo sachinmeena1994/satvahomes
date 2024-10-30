@@ -233,6 +233,7 @@ console.log(userDetails)
           for (const adData of advertisementData) {
             const activeAd = adData.advertisements.find(a => parseInt(a.adType) === adType && a.isActive && !displayedAds.has(a.advertise));
             if (activeAd) {
+              console.log("Displaying ad:", activeAd.advertise); // Log the ad being displayed
               await addImage({ imageUrl: activeAd.advertise, x, y, width, height });
               adFound = true;
               displayedAds.add(activeAd.advertise); // Mark this ad as displayed
@@ -340,7 +341,7 @@ console.log(userDetails)
       }
   
       // Add AdType 1 after the material table
-      await addAdByType({ adType: 1, x: 0, y: yPosition - 350, width: 850, height: 320 });
+      await addAdByType({ adType: 1, x: 0, y: yPosition - 330, width: 850, height: 290 });
   
       setProgress(80); // Progress for material information
     
