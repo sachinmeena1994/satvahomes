@@ -96,6 +96,16 @@ const Testheader = () => {
                   Admin
                 </Link>
               )}
+                 <Link
+                  to="/vendor"
+                  className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${
+                    location.pathname === "/contact"
+                      ? "text-[#056E55]"
+                      : "text-black"
+                  }`}
+                >
+                  Vendor
+                </Link>
               <Link
                 to="/contact"
                 className={`block text-3xl font-semibold px-4 py-2 hover:text-[#056E55] duration-700 ${

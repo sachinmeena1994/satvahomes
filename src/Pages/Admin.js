@@ -136,7 +136,7 @@ function Admin() {
               <span>Create Product</span>
             </li>
           }
-          {currentUser.userDetails?.role === "vendor" || currentUser.userDetails?.role === "admin" &&
+          {/* {currentUser.userDetails?.role === "vendor" || currentUser.userDetails?.role === "admin" &&
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${
                 menuOption === "advertisement"
@@ -147,7 +147,7 @@ function Admin() {
             >
               <FaAd className="text-lg" />
               <span>Vendor</span>
-            </li>}
+            </li>} */}
           {currentUser.userDetails?.role === "admin" &&
             <li
               className={`cursor-pointer py-3 px-4 rounded-lg flex items-center space-x-3 duration-200 ${

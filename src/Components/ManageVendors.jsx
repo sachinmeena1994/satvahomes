@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  getDocs,
-  collection,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { getDocs, collection, doc, updateDoc } from "firebase/firestore";
 import { fireDB, auth } from "../firebase-config";
 
 const ManageVendors = () => {
@@ -20,7 +15,6 @@ const ManageVendors = () => {
           id: doc.id,
           ...doc.data(),
         }));
-        console.log(adsData);
         setAdvertisements(adsData);
       }
     };
@@ -43,13 +37,11 @@ const ManageVendors = () => {
 
   return (
     <div className="container mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">
-        Vendor Dashboard
-      </h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-700">Vendor Dashboard</h2>
 
       <div className="mb-6">
         <table className="mt-4 w-full table-auto border-collapse overflow-hidden shadow-lg rounded-lg">
-          <thead className="">
+          <thead>
             <tr className="bg-[#056E55] text-white text-left pl-2">
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Advertisement</th>
@@ -58,39 +50,56 @@ const ManageVendors = () => {
               <th className="px-4 py-3">Status</th>
             </tr>
           </thead>
-          <tbody className="">
+          <tbody>
             {advertisements.map((ad) => (
-              <tr key={ad.id} className="text-left ">
+              <tr key={ad.id} className="text-left border-b">
                 <td className="pl-4 py-3">{ad.name}</td>
-                <td className="flex items-center ">
-                  {Array.isArray(ad.advertise) ? (
-                    ad.advertise.map((item, idx) => (
-                      // <p key={idx}>{item.advertise}</p>
-                      <img src={item.advertise} alt="ImageUrl"  className="object-cover m-1 h-20 w-20 "/>
+                
+                {/* Advertisement Images */}
+                <td className="flex flex-wrap gap-2">
+                  {Array.isArray(ad.advertisements) && ad.advertisements.length > 0 ? (
+                    ad.advertisements.map((item, idx) => (
+                      <img
+                        key={idx}
+                        src={item.advertise}
+                        alt={item.name || `Ad ${idx + 1}`}
+                        className="object-cover m-1 h-20 w-20"
+                      />
                     ))
                   ) : (
-                    <p>{ad.advertise}</p> // If it's a string, render directly
+                    <p>No advertisement available</p>
                   )}
                 </td>
-                <td className="pl-4">State: {ad.location.state}, Cities: {ad.location.city.join(", ")}</td>
 
+                {/* Location */}
+                <td className="pl-4">
+                  <p>State: {ad.location?.state}</p>
+                  <p>Cities: {ad.location?.city?.join(", ") || "N/A"}</p>
+                </td>
 
+                {/* Downloads */}
                 <td className="pl-5">
-                  {Array.isArray(ad.advertise) ? (
-                    ad.advertise.map((item, idx) => (
-                      // <p key={idx}>{item.advertise}</p>
-                      <td>{item.downloads}</td>
+                  {ad.advertisements && Array.isArray(ad.advertisements) && ad.advertisements.length > 0 ? (
+                    ad.advertisements.map((item, idx) => (
+                      <p key={idx}>
+                        {Object.entries(item.downloads || {}).map(([city, count]) => (
+                          <span key={city}>
+                            {city}: {count}{" "}
+                          </span>
+                        ))}
+                      </p>
                     ))
                   ) : (
-                    <p>{0}</p> // If it's a string, render directly
+                    <p>No downloads</p>
                   )}
                 </td>
-                {/*  */}
+
+                {/* Status */}
                 <td>
                   <button
                     onClick={() => toggleAdStatus(ad)}
-                    className={`px-4 py-2 rounded-lg text-black ${
-                      ad.isActive ? "bg-green-500" : "bg-[#F4EFE6]"
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      ad.isActive ? "bg-green-500" : "bg-gray-400"
                     }`}
                   >
                     {ad.isActive ? "Active" : "Inactive"}
